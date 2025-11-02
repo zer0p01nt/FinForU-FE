@@ -1,11 +1,3 @@
----
-name: pull request template
-about: PR 템플릿
-title: ""
-labels: ""
-assignees: ""
----
-
 ## 📌 관련 이슈
 
 <!-- 이슈 완료 전이면 close 없이 #00만 작성해주세요 -->
