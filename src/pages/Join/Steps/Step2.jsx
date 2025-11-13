@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import Dropdown from "../../../components/dropdown/DropDown";
+import Dropdown from "../../../components/dropdown/Dropdown";
 import * as S from "./StepsStyle";
 import MultiSelectHeader from "../../../components/multi-select-header/MultiSelectHeader";
 import { useCallback, useEffect, useMemo, useState } from "react";

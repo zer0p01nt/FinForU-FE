@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
 import * as S from "./StepsStyle";
-import Dropdown from "../../../components/dropdown/DropDown";
+import Dropdown from "../../../components/dropdown/Dropdown";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 export default function Step1({ formData, updateFormData, isSubmitted }) {
