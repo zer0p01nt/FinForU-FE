@@ -11,6 +11,8 @@ import ButtonGroup from "../../../components/button-group/ButtonGroup";
 import { useNavigate } from "react-router-dom";
 import api from "../../../api/api";
 import LoadingSpinner from "../../../components/loading-spinner/LoadingSpinner";
+import { Helmet } from "react-helmet-async";
+import { helmetTitle } from "../../../constants/title";
 
 export default function EditInformation() {
   const navigate = useNavigate();
@@ -271,127 +273,134 @@ export default function EditInformation() {
   };
 
   return (
-    <S.Container>
-      {isLoading && <LoadingSpinner />}
-      <J.Label>
-        {t("join.email")}
-        <J.Input
-          placeholder={t("join.email")}
-          value={formData.email}
-          onChange={(e) => {
-            updateFormData({ email: e.target.value });
-          }}
-        />
-        {isSubmitted && validationErrors.email && (
-          <J.ValidText>{validationErrors.email}</J.ValidText>
-        )}
-      </J.Label>
-      <J.Label>
-        {t("join.password")}
-        <div>
-          <J.PWInput
-            type="password"
-            placeholder={t("join.8DigitNumber")}
-            value={formData.password}
-            onChange={(e) => setNewPassword(e.target.value)}
+    <>
+      <Helmet>
+        <title>Edit Information{helmetTitle}</title>
+      </Helmet>
+      <S.Container>
+        {isLoading && <LoadingSpinner />}
+        <J.Label>
+          {t("join.email")}
+          <J.Input
+            placeholder={t("join.email")}
+            value={formData.email}
+            onChange={(e) => {
+              updateFormData({ email: e.target.value });
+            }}
           />
-          <J.PWAgainInput
-            type="password"
-            placeholder={t("join.passwordAgain")}
-            value={passwordAgain}
-            onChange={(e) => setPasswordAgain(e.target.value)}
+          {isSubmitted && validationErrors.email && (
+            <J.ValidText>{validationErrors.email}</J.ValidText>
+          )}
+        </J.Label>
+        <J.Label>
+          {t("join.password")}
+          <div>
+            <J.PWInput
+              type="password"
+              placeholder={t("join.8Characters")}
+              value={formData.password}
+              onChange={(e) => setNewPassword(e.target.value)}
+            />
+            <J.PWAgainInput
+              type="password"
+              placeholder={t("join.passwordAgain")}
+              value={passwordAgain}
+              onChange={(e) => setPasswordAgain(e.target.value)}
+            />
+          </div>
+          {isSubmitted && (validationErrors.newPassword || validationErrors.passwordAgain) && (
+            <J.ValidText>
+              {validationErrors.newPassword || validationErrors.passwordAgain}
+            </J.ValidText>
+          )}
+        </J.Label>
+        <J.Label>
+          {t("join.name")}
+          <J.Input
+            placeholder="KimMutsa"
+            value={formData.name}
+            onChange={(e) => updateFormData({ name: e.target.value })}
           />
-        </div>
-        {isSubmitted && (validationErrors.newPassword || validationErrors.passwordAgain) && (
-          <J.ValidText>
-            {validationErrors.newPassword || validationErrors.passwordAgain}
-          </J.ValidText>
-        )}
-      </J.Label>
-      <J.Label>
-        {t("join.name")}
-        <J.Input
-          placeholder="KimMutsa"
-          value={formData.name}
-          onChange={(e) => updateFormData({ name: e.target.value })}
+          {isSubmitted && validationErrors.name && (
+            <J.ValidText>{validationErrors.name}</J.ValidText>
+          )}
+        </J.Label>
+        <J.Label>
+          {t("join.nationality")}
+          <Dropdown
+            name={nationalityName}
+            placeholder={t("pleaseSelect")}
+            itemArray={nationalityArray}
+            onSelect={(name, value) => handleDropdownChange("nationality", value)}
+            selectedValue={formData.nationality}
+          />
+          {isSubmitted && validationErrors.nationality && (
+            <J.ValidText>{validationErrors.nationality}</J.ValidText>
+          )}
+        </J.Label>
+        <J.Label>
+          {t("settings.language")}
+          <Dropdown
+            name={languageName}
+            placeholder={t("pleaseSelect")}
+            itemArray={languageArray}
+            onSelect={(name, value) => handleDropdownChange("language", value)}
+            selectedValue={formData.language}
+          />
+        </J.Label>
+        <J.Label>
+          {t("join.visaType")}
+          <Dropdown
+            name={visaTypeName}
+            itemArray={visaTypeArray}
+            onSelect={handleDropdownChange}
+            selectedValue={formData.visaType}
+          />
+          {isSubmitted && validationErrors.visaType && (
+            <J.ValidText>{validationErrors.visaType}</J.ValidText>
+          )}
+        </J.Label>
+        <J.Label>
+          {t("join.visaExpirationDate")}
+          <J.Input
+            placeholder="MM/DD/YYYY"
+            value={formData.visaExpir || ""}
+            onChange={(e) => updateFormData({ visaExpir: e.target.value })}
+          />
+          {isSubmitted && validationErrors.visaExpir && (
+            <J.ValidText>{validationErrors.visaExpir}</J.ValidText>
+          )}
+        </J.Label>
+        <J.Label>
+          <MultiSelectHeader header={t("join.desiredProductType")} />
+          <S.ButtonWrapper>
+            {desireProductsArray.map((product) => (
+              <S.Button
+                key={product.value}
+                onClick={() => handleProductSelect(product)}
+                $selected={(formData.desiredProducts || []).includes(product.value)}
+              >
+                {product.label}
+              </S.Button>
+            ))}
+          </S.ButtonWrapper>
+          {isSubmitted && validationErrors.desiredProducts && (
+            <J.ValidText>{validationErrors.desiredProducts}</J.ValidText>
+          )}
+        </J.Label>
+        <J.Label>
+          {t("join.notificationSettings")}
+          <J.ToggleWrapper>
+            <div>{t("settings.pushNoti")}</div>
+            <ToggleSwitch name="notify" initialValue={isNotifyOn} onChange={handleNotifyToggle} />
+          </J.ToggleWrapper>
+        </J.Label>
+        <ButtonGroup
+          onGrayClick={() => navigate(-1)}
+          onBlueClick={handleSave}
+          blueDisabled={isLoading}
         />
-        {isSubmitted && validationErrors.name && <J.ValidText>{validationErrors.name}</J.ValidText>}
-      </J.Label>
-      <J.Label>
-        {t("join.nationality")}
-        <Dropdown
-          name={nationalityName}
-          placeholder={t("pleaseSelect")}
-          itemArray={nationalityArray}
-          onSelect={(name, value) => handleDropdownChange("nationality", value)}
-          selectedValue={formData.nationality}
-        />
-        {isSubmitted && validationErrors.nationality && (
-          <J.ValidText>{validationErrors.nationality}</J.ValidText>
-        )}
-      </J.Label>
-      <J.Label>
-        {t("settings.language")}
-        <Dropdown
-          name={languageName}
-          placeholder={t("pleaseSelect")}
-          itemArray={languageArray}
-          onSelect={(name, value) => handleDropdownChange("language", value)}
-          selectedValue={formData.language}
-        />
-      </J.Label>
-      <J.Label>
-        {t("join.visaType")}
-        <Dropdown
-          name={visaTypeName}
-          itemArray={visaTypeArray}
-          onSelect={handleDropdownChange}
-          selectedValue={formData.visaType}
-        />
-        {isSubmitted && validationErrors.visaType && (
-          <J.ValidText>{validationErrors.visaType}</J.ValidText>
-        )}
-      </J.Label>
-      <J.Label>
-        {t("join.visaExpirationDate")}
-        <J.Input
-          placeholder="MM/DD/YYYY"
-          value={formData.visaExpir || ""}
-          onChange={(e) => updateFormData({ visaExpir: e.target.value })}
-        />
-        {isSubmitted && validationErrors.visaExpir && (
-          <J.ValidText>{validationErrors.visaExpir}</J.ValidText>
-        )}
-      </J.Label>
-      <J.Label>
-        <MultiSelectHeader header={t("join.desiredProductType")} />
-        <S.ButtonWrapper>
-          {desireProductsArray.map((product) => (
-            <S.Button
-              key={product.value}
-              onClick={() => handleProductSelect(product)}
-              $selected={(formData.desiredProducts || []).includes(product.value)}
-            >
-              {product.label}
-            </S.Button>
-          ))}
-        </S.ButtonWrapper>
-        {isSubmitted && validationErrors.desiredProducts && (
-          <J.ValidText>{validationErrors.desiredProducts}</J.ValidText>
-        )}
-      </J.Label>
-      <J.Label>
-        {t("join.notificationSettings")}
-        <J.ToggleWrapper>
-          <div>{t("settings.pushNoti")}</div>
-          <ToggleSwitch name="notify" initialValue={isNotifyOn} onChange={handleNotifyToggle} />
-        </J.ToggleWrapper>
-      </J.Label>
-      <ButtonGroup
-        onGrayClick={() => navigate(-1)}
-        onBlueClick={handleSave}
-        blueDisabled={isLoading}
-      />
-    </S.Container>
+      </S.Container>
+    </>
   );
 }

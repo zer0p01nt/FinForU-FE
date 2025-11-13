@@ -11,6 +11,8 @@ import { LANG_MAP } from "../../constants/languageMap";
 import api from "../../api/api";
 import Loading from "./Loading/Loading";
 import Complete from "./Loading/Complete";
+import { helmetTitle } from "../../constants/title";
+import { Helmet } from "react-helmet-async";
 
 const TOTAL_STEPS = 3;
 
@@ -188,20 +190,25 @@ export default function Join() {
   }
 
   return (
-    <S.Container>
-      <S.IndicatorWrapper>
-        <S.Indicator>
-          <S.ProgressBar $percent={Math.min((step / TOTAL_STEPS) * 100, 100)} />
-        </S.Indicator>
-      </S.IndicatorWrapper>
-      <S.Content $step={step}>{renderContent()}</S.Content>
-      <ButtonGroup
-        grayText={t("back")}
-        onGrayClick={handleBack}
-        blueType={step === TOTAL_STEPS ? "submit" : "button"}
-        blueText={t("next")}
-        onBlueClick={step === TOTAL_STEPS ? handleSubmit : handleNext}
-      />
-    </S.Container>
+    <>
+      <Helmet>
+        <title>Join{helmetTitle}</title>
+      </Helmet>
+      <S.Container>
+        <S.IndicatorWrapper>
+          <S.Indicator>
+            <S.ProgressBar $percent={Math.min((step / TOTAL_STEPS) * 100, 100)} />
+          </S.Indicator>
+        </S.IndicatorWrapper>
+        <S.Content $step={step}>{renderContent()}</S.Content>
+        <ButtonGroup
+          grayText={t("back")}
+          onGrayClick={handleBack}
+          blueType={step === TOTAL_STEPS ? "submit" : "button"}
+          blueText={t("next")}
+          onBlueClick={step === TOTAL_STEPS ? handleSubmit : handleNext}
+        />
+      </S.Container>
+    </>
   );
 }

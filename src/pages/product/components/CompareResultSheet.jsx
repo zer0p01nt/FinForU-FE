@@ -1,6 +1,8 @@
+import { useTranslation } from "react-i18next";
 import * as S from "../ProductStyle";
 
 export default function CompareResultSheet({ isOpen, selection, onBack, onClose }) {
+  const { t } = useTranslation();
   if (!isOpen) return null;
 
   const currentType = selection[0]?.type === "card" ? "Card" : "Savings";
@@ -40,10 +42,10 @@ export default function CompareResultSheet({ isOpen, selection, onBack, onClose 
         </S.CompareResultGrid>
         <S.SheetFooter>
           <S.SecondaryButton type="button" onClick={onBack}>
-            Back
+            {t("back")}
           </S.SecondaryButton>
           <S.PrimaryButton type="button" onClick={onClose}>
-            Close
+            {t("map.close")}
           </S.PrimaryButton>
         </S.SheetFooter>
       </S.Sheet>

@@ -15,6 +15,8 @@ import GlobeIcon from "./icons/GlobeIcon.svg?react";
 import LocationIcon from "./icons/LocationIcon.svg?react";
 import TimeIcon from "./icons/TimeIcon.svg?react";
 import PinIcon from "./icons/PinIcon.svg";
+import { Helmet } from "react-helmet-async";
+import { helmetTitle } from "../../constants/title";
 
 // 카카오맵 API 키 (.env)
 const KAKAO_MAP_API_KEY = import.meta.env.VITE_KAKAO_MAP_API_KEY;
@@ -138,7 +140,7 @@ export default function Map() {
     img.style.objectFit = "contain";
     img.style.display = "block";
     img.className = "place-marker-image";
-    
+
     container.appendChild(img);
     return container;
   }, []);
@@ -167,16 +169,16 @@ export default function Map() {
 
       // 검색어 조합: 은행 필터와 서비스 필터를 조합
       let searchQuery = "";
-      
+
       // 은행 필터가 있으면 은행 이름을 우선 사용
       if (bankFilter && FILTER_CONFIGS[bankFilter]) {
         const bankConfig = FILTER_CONFIGS[bankFilter];
         searchQuery = bankConfig.query;
-        
+
         // 서비스 필터가 있으면 조합
         if (serviceFilter && FILTER_CONFIGS[serviceFilter]) {
           const serviceConfig = FILTER_CONFIGS[serviceFilter];
-          
+
           // ATM은 명시적으로 추가 (예: "하나은행 ATM")
           if (serviceFilter === "atm") {
             searchQuery = `${searchQuery} ${serviceConfig.query}`;
@@ -192,31 +194,36 @@ export default function Map() {
         // 둘 다 없으면 기본값 (일반은행)
         searchQuery = FILTER_CONFIGS.general.query;
       }
-      
+
       // 카카오맵 API 서비스 확인
       if (!window.kakao?.maps?.services?.Places) {
         console.error("카카오맵 Places 서비스를 사용할 수 없습니다.");
         setSearchError("지도 서비스를 초기화할 수 없습니다.");
         return;
       }
-      
+
       const service = new window.kakao.maps.services.Places();
-      
+
       // 위치 정보 유효성 검사
-      if (!position || !position.lat || !position.lng || 
-          isNaN(position.lat) || isNaN(position.lng)) {
+      if (
+        !position ||
+        !position.lat ||
+        !position.lng ||
+        isNaN(position.lat) ||
+        isNaN(position.lng)
+      ) {
         console.error("유효하지 않은 위치 정보:", position);
         setSearchError("위치 정보를 가져올 수 없습니다.");
         return;
       }
-      
+
       const center = new window.kakao.maps.LatLng(position.lat, position.lng);
-      
+
       // 옵션 설정 - ATM 검색 시 반경을 더 넓게 설정 (ATM은 은행보다 적을 수 있음)
       // effectiveServiceFilter를 사용하여 필터링 로직과 일치시킴
       const effectiveServiceFilter = serviceFilter || (bankFilter ? "general" : "general");
       const defaultRadius = effectiveServiceFilter === "atm" ? 20000 : 10000; // ATM: 20km, 기타: 10km
-      
+
       const options = {
         location: center,
         radius: defaultRadius,
@@ -232,7 +239,7 @@ export default function Map() {
         // status 체크를 먼저 수행
         // 카카오맵 API는 콜백이 호출되지 않거나 네트워크 오류 시 status가 null이 될 수 있음
         if (status === null || status === undefined) {
-        setIsSearching(false);
+          setIsSearching(false);
           console.error("카카오맵 검색 오류: status가 null입니다.", {
             bankFilter,
             serviceFilter,
@@ -250,7 +257,10 @@ export default function Map() {
         setIsSearching(false);
 
         // 에러 발생 시 상세 로그 출력
-        if (status !== window.kakao.maps.services.Status.OK && status !== window.kakao.maps.services.Status.ZERO_RESULT) {
+        if (
+          status !== window.kakao.maps.services.Status.OK &&
+          status !== window.kakao.maps.services.Status.ZERO_RESULT
+        ) {
           console.error("카카오맵 검색 오류 상세:", {
             status,
             statusText: window.kakao.maps.services.Status[status] || "알 수 없는 오류",
@@ -265,38 +275,37 @@ export default function Map() {
         if (status === window.kakao.maps.services.Status.OK) {
           // 필터에 따라 결과 필터링
           let filteredData = data;
-          
-          
+
           // 서비스 필터에 따른 필터링 (서비스 필터가 없으면 일반은행으로 처리)
           const effectiveServiceFilter = serviceFilter || (bankFilter ? "general" : "general");
-          
+
           if (effectiveServiceFilter === "general") {
             // 일반은행 필터: ATM 제외
             filteredData = data.filter((place) => {
               const categoryCode = place.category_group_code;
               const placeName = (place.place_name || "").toLowerCase();
               const categoryName = (place.category_name || "").toLowerCase();
-              
+
               // ATM 관련 카테고리 제외
               if (categoryCode === "AT4") {
                 return false;
               }
-              
+
               // 장소 이름에 "ATM"이 포함된 경우 제외
               if (placeName.includes("atm") || categoryName.includes("atm")) {
                 return false;
               }
-              
+
               // 은행 카테고리이거나 장소 이름에 "은행"이 포함된 경우만 포함
               if (categoryCode === "BK9") {
                 return true;
               }
-              
+
               // 장소 이름에 "은행"이 포함된 경우
               if (placeName.includes("은행")) {
                 return true;
               }
-              
+
               return false;
             });
           } else if (effectiveServiceFilter === "atm") {
@@ -305,7 +314,7 @@ export default function Map() {
             filteredData = data;
           }
           // 외국인특화지점 필터는 추가 필터링 없음 (검색 키워드가 이미 필터링함)
-          
+
           // 은행 필터가 있을 때는 해당 은행만 필터링
           if (bankFilter) {
             const bankName = FILTER_CONFIGS[bankFilter]?.query || "";
@@ -315,12 +324,12 @@ export default function Map() {
               return placeName.includes(bankName.toLowerCase());
             });
           }
-          
+
           // 각 장소에 거리 정보 추가 (API에서 제공하지 않는 경우 직접 계산)
           const placesWithDistance = filteredData.map((place) => {
             const placeLat = Number(place.y);
             const placeLng = Number(place.x);
-            
+
             // API에서 distance를 제공하지 않는 경우 직접 계산
             if (!place.distance && !Number.isNaN(placeLat) && !Number.isNaN(placeLng)) {
               const calculatedDistance = calculateDistance(
@@ -340,7 +349,7 @@ export default function Map() {
             const distanceB = b.distance ? Number(b.distance) : Infinity;
             return distanceA - distanceB;
           });
-          
+
           // 개수 제한 없이 모든 결과 표시
           setPlaces(sorted);
 
@@ -351,33 +360,37 @@ export default function Map() {
             if (!mapInstanceRef.current) return;
 
             try {
-            const positionLatLng = new window.kakao.maps.LatLng(lat, lng);
-            const currentLevel = mapInstanceRef.current?.getLevel() || 3;
-            const markerSize = getMarkerSize(currentLevel);
-            const markerContent = buildPlaceMarkerContent(markerSize);
-            if (markerContent && markerContent instanceof Node && markerContent.parentNode === null) {
-              const markerOverlay = new window.kakao.maps.CustomOverlay({
-              position: positionLatLng,
-                content: markerContent,
-                yAnchor: 1, // 하단 기준
-                xAnchor: 0.5, // 중앙 기준
-                zIndex: 2,
-              });
-              markerOverlay.setMap(mapInstanceRef.current);
-              
-              // 클릭 이벤트 추가
-              markerContent.addEventListener("click", (e) => {
-                e.stopPropagation();
-                handleCardClick(place);
-              });
-              
-              placeMarkersRef.current.push({ 
-                overlay: markerOverlay, 
-                content: markerContent,
-                place: place,
-                position: positionLatLng
-              });
-            }
+              const positionLatLng = new window.kakao.maps.LatLng(lat, lng);
+              const currentLevel = mapInstanceRef.current?.getLevel() || 3;
+              const markerSize = getMarkerSize(currentLevel);
+              const markerContent = buildPlaceMarkerContent(markerSize);
+              if (
+                markerContent &&
+                markerContent instanceof Node &&
+                markerContent.parentNode === null
+              ) {
+                const markerOverlay = new window.kakao.maps.CustomOverlay({
+                  position: positionLatLng,
+                  content: markerContent,
+                  yAnchor: 1, // 하단 기준
+                  xAnchor: 0.5, // 중앙 기준
+                  zIndex: 2,
+                });
+                markerOverlay.setMap(mapInstanceRef.current);
+
+                // 클릭 이벤트 추가
+                markerContent.addEventListener("click", (e) => {
+                  e.stopPropagation();
+                  handleCardClick(place);
+                });
+
+                placeMarkersRef.current.push({
+                  overlay: markerOverlay,
+                  content: markerContent,
+                  place: place,
+                  position: positionLatLng,
+                });
+              }
             } catch (error) {
               console.error("마커 생성 오류:", error, place);
             }
@@ -410,25 +423,25 @@ export default function Map() {
           setIsSearching(false);
           return;
         }
-        
+
         // 옵션 설정 - ATM 검색 시 반경을 더 넓게 설정
         // effectiveServiceFilter를 사용하여 필터링 로직과 일치시킴
-        const effectiveServiceFilterForSearch = serviceFilter || (bankFilter ? "general" : "general");
+        const effectiveServiceFilterForSearch =
+          serviceFilter || (bankFilter ? "general" : "general");
         const searchRadius = effectiveServiceFilterForSearch === "atm" ? 20000 : 5000; // ATM: 20km, 기타: 5km
-        
+
         const searchOptions = {
           location: center,
           radius: searchRadius,
         };
-        
+
         // size 옵션 설정 (기본값 15개)
         try {
           searchOptions.size = 15;
         } catch (e) {
           // size 옵션 추가 실패 시 무시
         }
-        
-        
+
         // 타임아웃 설정 (10초 후 콜백이 호출되지 않으면 오류 처리)
         let timeoutTriggered = false;
         const timeoutId = setTimeout(() => {
@@ -441,7 +454,7 @@ export default function Map() {
           setSearchError("검색 시간이 초과되었습니다. 다시 시도해주세요.");
           setPlaces([]);
         }, 10000);
-        
+
         // 원래 콜백을 래핑하여 타임아웃 취소
         const wrappedCallback = (data, status) => {
           if (timeoutTriggered) {
@@ -451,7 +464,7 @@ export default function Map() {
           clearTimeout(timeoutId);
           callback(data, status);
         };
-        
+
         try {
           service.keywordSearch(searchQuery, wrappedCallback, searchOptions);
         } catch (searchError) {
@@ -561,9 +574,9 @@ export default function Map() {
       console.error("카카오맵 스크립트 로드 실패");
     };
     script.addEventListener("error", errorHandler, { once: true });
-    
+
     if (document.head) {
-    document.head.appendChild(script);
+      document.head.appendChild(script);
     } else {
       console.error("document.head가 없습니다.");
       return;
@@ -571,7 +584,7 @@ export default function Map() {
 
     return () => {
       if (script && script.parentNode) {
-      script.removeEventListener("load", handleScriptLoad);
+        script.removeEventListener("load", handleScriptLoad);
         script.removeEventListener("error", errorHandler);
       }
     };
@@ -594,96 +607,105 @@ export default function Map() {
         console.error("지도 컨테이너를 찾을 수 없습니다.");
         return;
       }
-      
+
       const options = {
         center: mapCenter,
         level: 3,
       };
-      
+
       try {
-      const kakaoMap = new window.kakao.maps.Map(container, options);
-      kakaoMap.setDraggable(true);
-      kakaoMap.setZoomable(true);
+        const kakaoMap = new window.kakao.maps.Map(container, options);
+        kakaoMap.setDraggable(true);
+        kakaoMap.setZoomable(true);
 
-      mapInstanceRef.current = kakaoMap;
-      hasCenteredToCurrentRef.current = false;
+        mapInstanceRef.current = kakaoMap;
+        hasCenteredToCurrentRef.current = false;
 
-      window.kakao.maps.event.addListener(kakaoMap, "dragstart", () => {
-        hasCenteredToCurrentRef.current = true;
-      });
-
-      // 지도 zoom 변경 시 마커 크기 업데이트
-      window.kakao.maps.event.addListener(kakaoMap, "zoom_changed", () => {
-        const currentLevel = kakaoMap.getLevel();
-        const newSize = getMarkerSize(currentLevel);
-        
-        // 모든 마커의 크기 업데이트
-        placeMarkersRef.current.forEach((markerData) => {
-          if (markerData.content && markerData.overlay) {
-            const container = markerData.content;
-            const img = container.querySelector(".place-marker-image");
-            
-            if (container && img) {
-              container.style.width = `${newSize}px`;
-              container.style.height = `${newSize * 1.25}px`;
-            }
-          }
+        window.kakao.maps.event.addListener(kakaoMap, "dragstart", () => {
+          hasCenteredToCurrentRef.current = true;
         });
-      });
+
+        // 지도 zoom 변경 시 마커 크기 업데이트
+        window.kakao.maps.event.addListener(kakaoMap, "zoom_changed", () => {
+          const currentLevel = kakaoMap.getLevel();
+          const newSize = getMarkerSize(currentLevel);
+
+          // 모든 마커의 크기 업데이트
+          placeMarkersRef.current.forEach((markerData) => {
+            if (markerData.content && markerData.overlay) {
+              const container = markerData.content;
+              const img = container.querySelector(".place-marker-image");
+
+              if (container && img) {
+                container.style.width = `${newSize}px`;
+                container.style.height = `${newSize * 1.25}px`;
+              }
+            }
+          });
+        });
       } catch (error) {
         console.error("지도 초기화 오류:", error);
         return;
       }
 
       // 지도가 완전히 로드된 후 마커 추가
-      window.kakao.maps.event.addListener(mapInstanceRef.current, "tilesloaded", () => {
-        if (!userMarkerOverlayRef.current) {
-          try {
-            const markerContent = buildUserMarkerContent();
-            if (markerContent && markerContent instanceof Node && markerContent.parentNode === null) {
-      const userMarkerOverlay = new window.kakao.maps.CustomOverlay({
-        position: mapCenter,
-                content: markerContent,
-        yAnchor: 0.5,
-        xAnchor: 0.5,
-        zIndex: 3,
-      });
-              userMarkerOverlay.setMap(mapInstanceRef.current);
-      userMarkerOverlayRef.current = userMarkerOverlay;
-            }
-          } catch (error) {
-            console.error("마커 오버레이 생성 오류:", error);
-          }
-        }
-
-        if (!userAccuracyCircleRef.current && mapInstanceRef.current) {
-          try {
-            // 지도가 완전히 준비될 때까지 약간의 지연
-            setTimeout(() => {
-              if (!mapInstanceRef.current || userAccuracyCircleRef.current) return;
-              
-              try {
-      const accuracyCircle = new window.kakao.maps.Circle({
-        center: mapCenter,
-        radius: accuracyRadius,
-        strokeWeight: 0,
-        fillColor: "rgba(0, 156, 234, 0.2)",
-        fillOpacity: 1,
-      });
-                
-                if (mapInstanceRef.current) {
-                  accuracyCircle.setMap(mapInstanceRef.current);
-      userAccuracyCircleRef.current = accuracyCircle;
-                }
-              } catch (error) {
-                console.error("정확도 원 생성 오류:", error);
+      window.kakao.maps.event.addListener(
+        mapInstanceRef.current,
+        "tilesloaded",
+        () => {
+          if (!userMarkerOverlayRef.current) {
+            try {
+              const markerContent = buildUserMarkerContent();
+              if (
+                markerContent &&
+                markerContent instanceof Node &&
+                markerContent.parentNode === null
+              ) {
+                const userMarkerOverlay = new window.kakao.maps.CustomOverlay({
+                  position: mapCenter,
+                  content: markerContent,
+                  yAnchor: 0.5,
+                  xAnchor: 0.5,
+                  zIndex: 3,
+                });
+                userMarkerOverlay.setMap(mapInstanceRef.current);
+                userMarkerOverlayRef.current = userMarkerOverlay;
               }
-            }, 100);
-          } catch (error) {
-            console.error("정확도 원 생성 오류:", error);
+            } catch (error) {
+              console.error("마커 오버레이 생성 오류:", error);
+            }
           }
-        }
-      }, { once: true });
+
+          if (!userAccuracyCircleRef.current && mapInstanceRef.current) {
+            try {
+              // 지도가 완전히 준비될 때까지 약간의 지연
+              setTimeout(() => {
+                if (!mapInstanceRef.current || userAccuracyCircleRef.current) return;
+
+                try {
+                  const accuracyCircle = new window.kakao.maps.Circle({
+                    center: mapCenter,
+                    radius: accuracyRadius,
+                    strokeWeight: 0,
+                    fillColor: "rgba(0, 156, 234, 0.2)",
+                    fillOpacity: 1,
+                  });
+
+                  if (mapInstanceRef.current) {
+                    accuracyCircle.setMap(mapInstanceRef.current);
+                    userAccuracyCircleRef.current = accuracyCircle;
+                  }
+                } catch (error) {
+                  console.error("정확도 원 생성 오류:", error);
+                }
+              }, 100);
+            } catch (error) {
+              console.error("정확도 원 생성 오류:", error);
+            }
+          }
+        },
+        { once: true }
+      );
     } else {
       if (!hasCenteredToCurrentRef.current) {
         mapInstanceRef.current.panTo(mapCenter);
@@ -694,22 +716,22 @@ export default function Map() {
         try {
           const markerContent = buildUserMarkerContent();
           if (markerContent && markerContent instanceof Node && markerContent.parentNode === null) {
-        const userMarkerOverlay = new window.kakao.maps.CustomOverlay({
-          position: mapCenter,
+            const userMarkerOverlay = new window.kakao.maps.CustomOverlay({
+              position: mapCenter,
               content: markerContent,
-          yAnchor: 0.5,
-          xAnchor: 0.5,
-          zIndex: 3,
-        });
-        userMarkerOverlay.setMap(mapInstanceRef.current);
-        userMarkerOverlayRef.current = userMarkerOverlay;
+              yAnchor: 0.5,
+              xAnchor: 0.5,
+              zIndex: 3,
+            });
+            userMarkerOverlay.setMap(mapInstanceRef.current);
+            userMarkerOverlayRef.current = userMarkerOverlay;
           }
         } catch (error) {
           console.error("마커 오버레이 생성 오류:", error);
         }
       } else {
         try {
-        userMarkerOverlayRef.current.setPosition(mapCenter);
+          userMarkerOverlayRef.current.setPosition(mapCenter);
         } catch (error) {
           console.error("마커 위치 업데이트 오류:", error);
         }
@@ -717,31 +739,31 @@ export default function Map() {
 
       if (!userAccuracyCircleRef.current && mapInstanceRef.current) {
         try {
-        const accuracyCircle = new window.kakao.maps.Circle({
-          center: mapCenter,
-          radius: accuracyRadius,
-          strokeWeight: 0,
-          fillColor: "rgba(0, 156, 234, 0.2)",
-          fillOpacity: 1,
-        });
-          
+          const accuracyCircle = new window.kakao.maps.Circle({
+            center: mapCenter,
+            radius: accuracyRadius,
+            strokeWeight: 0,
+            fillColor: "rgba(0, 156, 234, 0.2)",
+            fillOpacity: 1,
+          });
+
           if (mapInstanceRef.current) {
-        accuracyCircle.setMap(mapInstanceRef.current);
-        userAccuracyCircleRef.current = accuracyCircle;
+            accuracyCircle.setMap(mapInstanceRef.current);
+            userAccuracyCircleRef.current = accuracyCircle;
           }
         } catch (error) {
           console.error("정확도 원 생성 오류:", error);
         }
       } else if (userAccuracyCircleRef.current && mapInstanceRef.current) {
         try {
-        userAccuracyCircleRef.current.setOptions({
-          center: mapCenter,
-          radius: accuracyRadius,
-        });
+          userAccuracyCircleRef.current.setOptions({
+            center: mapCenter,
+            radius: accuracyRadius,
+          });
         } catch (error) {
           console.error("정확도 원 업데이트 오류:", error);
+        }
       }
-    }
     }
   }, [isScriptLoaded, currentPosition, buildUserMarkerContent]);
 
@@ -750,7 +772,6 @@ export default function Map() {
     if (!isScriptLoaded || !mapInstanceRef.current) return;
     performSearch(selectedBankFilter, selectedServiceFilter, currentPosition);
   }, [isScriptLoaded, selectedBankFilter, selectedServiceFilter, currentPosition, performSearch]);
-
 
   // 필터 버튼 데이터
   const bankFilters = [
@@ -782,18 +803,18 @@ export default function Map() {
     setSelectedPlace(place);
     setIsDetailOpen(true);
     setSheetPosition(0); // 닫힌 상태에서 시작
-    
+
     // 카드 선택 시 해당 위치로 지도 이동
     if (mapInstanceRef.current && place.y && place.x) {
       const placeLat = Number(place.y);
       const placeLng = Number(place.x);
-      
+
       if (!Number.isNaN(placeLat) && !Number.isNaN(placeLng)) {
         const moveLatLon = new window.kakao.maps.LatLng(placeLat, placeLng);
         mapInstanceRef.current.panTo(moveLatLon);
       }
     }
-    
+
     // 약간의 지연 후 카드를 올라가게 함 (애니메이션 효과)
     setTimeout(() => {
       setSheetPosition(1);
@@ -823,15 +844,15 @@ export default function Map() {
   const handleTouchMove = (e) => {
     if (!isDragging || !isDetailOpen) return;
     e.preventDefault();
-    
+
     const currentY = e.touches[0].clientY;
     const deltaY = dragStartY - currentY; // 위로 드래그하면 양수
     dragDistanceRef.current = Math.abs(deltaY);
     hasMovedRef.current = true;
-    
+
     const sheetHeight = sheetRef.current?.offsetHeight || 0;
     const maxDelta = sheetHeight * 0.8; // 최대 드래그 거리
-    
+
     // 드래그 거리를 0-1 사이의 위치로 변환
     const newPosition = Math.max(0, Math.min(1, dragStartPosition + deltaY / maxDelta));
     setSheetPosition(newPosition);
@@ -841,13 +862,13 @@ export default function Map() {
   const handleTouchEnd = () => {
     if (!isDragging) return;
     setIsDragging(false);
-    
+
     // 드래그가 거의 없으면 (10px 미만) 클릭으로 간주하여 닫기
     if (!hasMovedRef.current || dragDistanceRef.current < 10) {
       handleDetailClose();
       return;
     }
-    
+
     // 드래그 속도나 위치에 따라 열림/닫힘 결정
     // 0.3 이하면 닫기, 그 이상이면 열기
     setSheetPosition((currentPosition) => {
@@ -870,32 +891,35 @@ export default function Map() {
     hasMovedRef.current = false;
   };
 
-  const handleMouseMove = useCallback((e) => {
-    if (!isDragging || !isDetailOpen) return;
-    e.preventDefault();
-    
-    const currentY = e.clientY;
-    const deltaY = dragStartY - currentY;
-    dragDistanceRef.current = Math.abs(deltaY);
-    hasMovedRef.current = true;
-    
-    const sheetHeight = sheetRef.current?.offsetHeight || 0;
-    const maxDelta = sheetHeight * 0.8;
-    
-    const newPosition = Math.max(0, Math.min(1, dragStartPosition + deltaY / maxDelta));
-    setSheetPosition(newPosition);
-  }, [isDragging, isDetailOpen, dragStartY, dragStartPosition]);
+  const handleMouseMove = useCallback(
+    (e) => {
+      if (!isDragging || !isDetailOpen) return;
+      e.preventDefault();
+
+      const currentY = e.clientY;
+      const deltaY = dragStartY - currentY;
+      dragDistanceRef.current = Math.abs(deltaY);
+      hasMovedRef.current = true;
+
+      const sheetHeight = sheetRef.current?.offsetHeight || 0;
+      const maxDelta = sheetHeight * 0.8;
+
+      const newPosition = Math.max(0, Math.min(1, dragStartPosition + deltaY / maxDelta));
+      setSheetPosition(newPosition);
+    },
+    [isDragging, isDetailOpen, dragStartY, dragStartPosition]
+  );
 
   const handleMouseUp = useCallback(() => {
     if (!isDragging) return;
     setIsDragging(false);
-    
+
     // 드래그가 거의 없으면 (10px 미만) 클릭으로 간주하여 닫기
     if (!hasMovedRef.current || dragDistanceRef.current < 10) {
       handleDetailClose();
       return;
     }
-    
+
     setSheetPosition((currentPosition) => {
       if (currentPosition < 0.3) {
         setIsDetailOpen(false);
@@ -929,14 +953,19 @@ export default function Map() {
   // 장소 이름에서 은행 이름을 추출하여 로고 이미지 경로 반환
   const getBankLogo = useCallback((placeName) => {
     if (!placeName) return null;
-    
+
     const name = placeName.toLowerCase();
-    
+
     // 은행 이름 매칭 (우선순위: 정확한 매칭 > 부분 매칭)
     if (name.includes("하나은행") || name.includes("하나 은행") || name.includes("hana")) {
       return HanaBankLogo;
     }
-    if (name.includes("국민은행") || name.includes("국민 은행") || name.includes("kookmin") || name.includes("kb")) {
+    if (
+      name.includes("국민은행") ||
+      name.includes("국민 은행") ||
+      name.includes("kookmin") ||
+      name.includes("kb")
+    ) {
       return KookminBankLogo;
     }
     if (name.includes("신한은행") || name.includes("신한 은행") || name.includes("shinhan")) {
@@ -945,21 +974,26 @@ export default function Map() {
     if (name.includes("우리은행") || name.includes("우리 은행") || name.includes("woori")) {
       return WooriBankLogo;
     }
-    
+
     return null;
   }, []);
 
   // 장소 이름에서 은행 이름을 추출하여 은행 공식 웹사이트 URL 반환
   const getBankWebsite = useCallback((placeName) => {
     if (!placeName) return null;
-    
+
     const name = placeName.toLowerCase();
-    
+
     // 은행 이름 매칭하여 공식 웹사이트 URL 반환
     if (name.includes("하나은행") || name.includes("하나 은행") || name.includes("hana")) {
       return "https://www.kebhana.com/cont/util/util04/util0401/index.jsp";
     }
-    if (name.includes("국민은행") || name.includes("국민 은행") || name.includes("kookmin") || name.includes("kb")) {
+    if (
+      name.includes("국민은행") ||
+      name.includes("국민 은행") ||
+      name.includes("kookmin") ||
+      name.includes("kb")
+    ) {
       return "https://omoney.kbstar.com/quics?page=C016505#loading";
     }
     if (name.includes("신한은행") || name.includes("신한 은행") || name.includes("shinhan")) {
@@ -968,7 +1002,7 @@ export default function Map() {
     if (name.includes("우리은행") || name.includes("우리 은행") || name.includes("woori")) {
       return "https://spot.wooribank.com/pot/Dream?withyou=TCTPB0022";
     }
-    
+
     return null;
   }, []);
 
@@ -976,6 +1010,9 @@ export default function Map() {
 
   return (
     <>
+      <Helmet>
+        <title>Map{helmetTitle}</title>
+      </Helmet>
       <S.Container>
         <S.FilterSection>
           <S.FilterRow>
@@ -1017,84 +1054,87 @@ export default function Map() {
         </S.MapWrapper>
 
         {!isDetailOpen && (
-        <S.CardSection>
-          <S.CardRow>
-            {isSearching ? (
-              <S.InfoCard $isInteractive={false}>
-                <S.CardInfo>주변 정보를 불러오는 중입니다...</S.CardInfo>
-              </S.InfoCard>
-            ) : searchError ? (
-              <S.InfoCard $isInteractive={false}>
-                <S.CardInfo>{searchError}</S.CardInfo>
-              </S.InfoCard>
-            ) : places.length === 0 ? (
-              <S.InfoCard $isInteractive={false}>
-                <S.CardInfo>주변에 표시할 지점이 없습니다.</S.CardInfo>
-              </S.InfoCard>
-            ) : (
-              places.map((place) => {
-                const bankWebsite = getBankWebsite(place.place_name);
-                return (
-                  <S.InfoCard
-                    key={place.id}
-                    $isActive={selectedPlace?.id === place.id}
-                    $isInteractive
-                    onClick={() => handleCardClick(place)}
-                    role="button"
-                    tabIndex={0}
-                    onKeyDown={(event) => {
-                      if (event.key === "Enter" || event.key === " ") {
-                        handleCardClick(place);
-                        event.preventDefault();
-                      }
-                    }}
-                  >
-                    <S.CardContent>
-                      <S.CardTextContent>
-                    <S.CardTitle>{place.place_name}</S.CardTitle>
-                        <S.CardInfo 
-                          $hasDivider={
-                            (place.category_group_code === "AT4" || 
-                             (place.place_name || "").toLowerCase().includes("atm")) ||
-                            place.phone ||
-                            bankWebsite
-                          }
-                        >
-                          {place.road_address_name || place.address_name}
-                        </S.CardInfo>
-                        {(place.category_group_code === "AT4" || 
-                          (place.place_name || "").toLowerCase().includes("atm")) && (
-                          <S.CardInfoWithIcon 
-                            $hasDivider={place.phone || bankWebsite}
+          <S.CardSection>
+            <S.CardRow>
+              {isSearching ? (
+                <S.InfoCard $isInteractive={false}>
+                  <S.CardInfo>주변 정보를 불러오는 중입니다...</S.CardInfo>
+                </S.InfoCard>
+              ) : searchError ? (
+                <S.InfoCard $isInteractive={false}>
+                  <S.CardInfo>{searchError}</S.CardInfo>
+                </S.InfoCard>
+              ) : places.length === 0 ? (
+                <S.InfoCard $isInteractive={false}>
+                  <S.CardInfo>주변에 표시할 지점이 없습니다.</S.CardInfo>
+                </S.InfoCard>
+              ) : (
+                places.map((place) => {
+                  const bankWebsite = getBankWebsite(place.place_name);
+                  return (
+                    <S.InfoCard
+                      key={place.id}
+                      $isActive={selectedPlace?.id === place.id}
+                      $isInteractive
+                      onClick={() => handleCardClick(place)}
+                      role="button"
+                      tabIndex={0}
+                      onKeyDown={(event) => {
+                        if (event.key === "Enter" || event.key === " ") {
+                          handleCardClick(place);
+                          event.preventDefault();
+                        }
+                      }}
+                    >
+                      <S.CardContent>
+                        <S.CardTextContent>
+                          <S.CardTitle>{place.place_name}</S.CardTitle>
+                          <S.CardInfo
+                            $hasDivider={
+                              place.category_group_code === "AT4" ||
+                              (place.place_name || "").toLowerCase().includes("atm") ||
+                              place.phone ||
+                              bankWebsite
+                            }
                           >
-                            <TimeIcon />
-                            <S.CardHoursText>
-                              <S.CardOpenStatus>Open</S.CardOpenStatus>
-                            </S.CardHoursText>
-                          </S.CardInfoWithIcon>
-                        )}
-                        {place.phone && (
-                          <S.CardInfoWithIcon>
-                            <CallIcon />
-                            <span>{place.phone}</span>
-                          </S.CardInfoWithIcon>
-                        )}
-                        {bankWebsite && (
-                          <S.CardInfoWithIcon>
-                            <GlobeIcon />
-                            <S.CardLink href={bankWebsite} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()}>
-                              Find a branch
-                    </S.CardLink>
-                          </S.CardInfoWithIcon>
-                        )}
-                      </S.CardTextContent>
-                    </S.CardContent>
-                  </S.InfoCard>
-                );
-              })
-            )}
-          </S.CardRow>
-        </S.CardSection>
+                            {place.road_address_name || place.address_name}
+                          </S.CardInfo>
+                          {(place.category_group_code === "AT4" ||
+                            (place.place_name || "").toLowerCase().includes("atm")) && (
+                            <S.CardInfoWithIcon $hasDivider={place.phone || bankWebsite}>
+                              <TimeIcon />
+                              <S.CardHoursText>
+                                <S.CardOpenStatus>Open</S.CardOpenStatus>
+                              </S.CardHoursText>
+                            </S.CardInfoWithIcon>
+                          )}
+                          {place.phone && (
+                            <S.CardInfoWithIcon>
+                              <CallIcon />
+                              <span>{place.phone}</span>
+                            </S.CardInfoWithIcon>
+                          )}
+                          {bankWebsite && (
+                            <S.CardInfoWithIcon>
+                              <GlobeIcon />
+                              <S.CardLink
+                                href={bankWebsite}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                Find a branch
+                              </S.CardLink>
+                            </S.CardInfoWithIcon>
+                          )}
+                        </S.CardTextContent>
+                      </S.CardContent>
+                    </S.InfoCard>
+                  );
+                })
+              )}
+            </S.CardRow>
+          </S.CardSection>
         )}
         {selectedPlace && (
           <S.DetailSheet
@@ -1118,16 +1158,16 @@ export default function Map() {
               <S.DetailHeaderContent>
                 {getBankLogo(selectedPlace.place_name) && (
                   <S.DetailBankLogo
-                    src={getBankLogo(selectedPlace.place_name)} 
+                    src={getBankLogo(selectedPlace.place_name)}
                     alt={selectedPlace.place_name}
                     onError={(e) => {
-                      e.target.style.display = 'none';
+                      e.target.style.display = "none";
                     }}
                   />
                 )}
-              <div>
-                <S.DetailTitle>{selectedPlace.place_name}</S.DetailTitle>
-              </div>
+                <div>
+                  <S.DetailTitle>{selectedPlace.place_name}</S.DetailTitle>
+                </div>
               </S.DetailHeaderContent>
             </S.DetailHeader>
             <S.DetailBody>
@@ -1137,7 +1177,7 @@ export default function Map() {
                 </S.DetailIcon>
                 <span>{selectedPlace.road_address_name || selectedPlace.address_name}</span>
               </S.DetailRow>
-              {(selectedPlace.category_group_code === "AT4" || 
+              {(selectedPlace.category_group_code === "AT4" ||
                 (selectedPlace.place_name || "").toLowerCase().includes("atm")) && (
                 <S.DetailRow>
                   <S.DetailIcon aria-hidden>
@@ -1161,7 +1201,11 @@ export default function Map() {
                   <S.DetailIcon aria-hidden>
                     <GlobeIcon />
                   </S.DetailIcon>
-                  <S.DetailLink href={getBankWebsite(selectedPlace.place_name)} target="_blank" rel="noopener noreferrer">
+                  <S.DetailLink
+                    href={getBankWebsite(selectedPlace.place_name)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
                     Find a branch
                   </S.DetailLink>
                 </S.DetailRow>

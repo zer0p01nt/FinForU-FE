@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { getBankLogo } from "../Product";
 import * as S from "../ProductStyle";
 
@@ -10,6 +11,7 @@ export default function CompareSelectSheet({
   onClose,
   onProceed,
 }) {
+  const { t } = useTranslation();
   if (!isOpen) return null;
 
   const isSelected = (productId) => selection.some((item) => item.id === productId);
@@ -18,7 +20,7 @@ export default function CompareSelectSheet({
     <S.Overlay>
       <S.Sheet>
         <S.SheetHandle />
-        <S.SheetTitle>Select Accounts to compare</S.SheetTitle>
+        <S.SheetTitle>{t("product.selectAccounts")}</S.SheetTitle>
         <S.SelectorList>
           {products.map((product) => {
             const selected = isSelected(product.id);
@@ -65,10 +67,10 @@ export default function CompareSelectSheet({
         </S.SelectorList>
         <S.SheetFooter>
           <S.SecondaryButton type="button" onClick={onClose}>
-            Cancel
+            {t("cancel")}
           </S.SecondaryButton>
           <S.PrimaryButton type="button" onClick={onProceed}>
-            Compare
+            {t("product.compare")}
           </S.PrimaryButton>
         </S.SheetFooter>
         <S.CompareNotice>

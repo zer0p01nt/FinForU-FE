@@ -34,7 +34,7 @@
     "join": "Join",
     "email": "Email",
     "password": "Password",
-    "8DigitNumber": "8-digit number",
+    "8Characters": "At least 8 characters",
     "passwordAgain": "Please enter your password again",
     "name": "Name",
     "nationality": "Nationality",
@@ -143,6 +143,7 @@
     "selectAccounts": "Select Accounts to compare",
     "viewWebsite": "View Website",
     "editPreferences": "Edit Preferences",
+    "yourSummary": "Your Preference Summary",
     "desiredProductType": "Desired Product Type",
     "savingsGoalPeriod": "Savings Goal Period",
     "savingsPurpose": "Savings Purpose",
@@ -163,7 +164,9 @@
     "preferredBank": "Preferred Bank (optional)",
     "purpose": "Purpose",
     "loginToSee": "Login to see personalized recommendations.",
-    "loginDesc": "Our AI will find the best financial products\nfor you once you log in."
+    "loginDesc": "Our AI will find the best financial products\nfor you once you log in.",
+    "reset": "Reset",
+    "done": "Done"
   },
   "rates": {
     "currencyExchangeRate": "Currency Exchange Rate",

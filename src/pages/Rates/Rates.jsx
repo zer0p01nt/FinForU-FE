@@ -12,6 +12,8 @@ import hanaLogo from "./icon/hana.png";
 import kookminLogo from "./icon/kookmin.png";
 import wooriLogo from "./icon/woori.png";
 import LoadingSpinner from "../../components/loading-spinner/LoadingSpinner";
+import { Helmet } from "react-helmet-async";
+import { helmetTitle } from "../../constants/title";
 // 매핑 파일
 const bankLogos = {
   shinhan: shinhanLogo,
@@ -187,73 +189,78 @@ export default function Rates() {
   const isDataReady = loading || !chartReady || finalGraphData.length === 0;
 
   return (
-    <S.Container>
-      {isDataReady && <LoadingSpinner />}
-      <S.TopBox>
-        <S.Toast>{toastMessage || t("rates.recommendMsg")}</S.Toast>
-        <S.Title>{t("rates.currencyExchangeRate")}</S.Title>
-        <S.ButtonWrapper onChange={handleCurrencyChange}>
-          {exchangeRateData.data.map((item) => {
-            const type = item.ExchangeRateData.currencyType;
-            return (
-              <div key={type}>
-                <input
-                  type="radio"
-                  id={type}
-                  name="currencyType"
-                  value={type}
-                  checked={selectedCurrency === type}
-                  readOnly={true} // 선택 가능
-                />
-                <label htmlFor={type}>{type}</label>
-              </div>
-            );
-          })}
-        </S.ButtonWrapper>
-      </S.TopBox>
-      <S.GraphWrapper>
-        <S.MiniTitle>KRW to {currencyType}</S.MiniTitle>
-        <S.RateBox>
-          <S.Rate>{todayRate.toLocaleString()}</S.Rate>
-          <S.TodayBox>
-            <S.Today>{t("rates.today")}</S.Today>
-            <S.TodayRate>+{rateCompareYesterday.toFixed(1)}%</S.TodayRate>
-          </S.TodayBox>
-        </S.RateBox>
-        <S.PeriodBtnWrapper>
-          <S.OneWeekBtn
-            onClick={() => handlePeriodChange("1_WEEK")}
-            $active={selectedPeriod === "1_WEEK"}
-          >
-            1 WEEK
-          </S.OneWeekBtn>
-          <S.ThreeMonthsBtn
-            onClick={() => handlePeriodChange("3_MONTHS")}
-            $active={selectedPeriod === "3_MONTHS"}
-          >
-            3 MONTHS
-          </S.ThreeMonthsBtn>
-          <S.OneYearBtn
-            onClick={() => handlePeriodChange("1_YEAR")}
-            $active={selectedPeriod === "1_YEAR"}
-          >
-            1 YEAR
-          </S.OneYearBtn>
-        </S.PeriodBtnWrapper>
-        <RateChart graphData={finalGraphData} onLoadComplete={handleChartLoad} />
-      </S.GraphWrapper>
-      <S.FeeBox>
-        <S.Title>{t("rates.feeComparison")}</S.Title>
-        {eachBankFee.map((item) => (
-          <S.FeeItem key={item.bank}>
-            <img src={bankLogos[item.bank]} />
-            <S.NameBox>
-              <S.Bank>{t(`banks.${item.bank}`)}</S.Bank>
-              <S.Fee>{formatFee(item.fee)}</S.Fee>
-            </S.NameBox>
-          </S.FeeItem>
-        ))}
-      </S.FeeBox>
-    </S.Container>
+    <>
+      <Helmet>
+        <title>Rates{helmetTitle}</title>
+      </Helmet>
+      <S.Container>
+        {isDataReady && <LoadingSpinner />}
+        <S.TopBox>
+          <S.Toast>{toastMessage || t("rates.recommendMsg")}</S.Toast>
+          <S.Title>{t("rates.currencyExchangeRate")}</S.Title>
+          <S.ButtonWrapper onChange={handleCurrencyChange}>
+            {exchangeRateData.data.map((item) => {
+              const type = item.ExchangeRateData.currencyType;
+              return (
+                <div key={type}>
+                  <input
+                    type="radio"
+                    id={type}
+                    name="currencyType"
+                    value={type}
+                    checked={selectedCurrency === type}
+                    readOnly={true} // 선택 가능
+                  />
+                  <label htmlFor={type}>{type}</label>
+                </div>
+              );
+            })}
+          </S.ButtonWrapper>
+        </S.TopBox>
+        <S.GraphWrapper>
+          <S.MiniTitle>KRW to {currencyType}</S.MiniTitle>
+          <S.RateBox>
+            <S.Rate>{todayRate.toLocaleString()}</S.Rate>
+            <S.TodayBox>
+              <S.Today>{t("rates.today")}</S.Today>
+              <S.TodayRate>+{rateCompareYesterday.toFixed(1)}%</S.TodayRate>
+            </S.TodayBox>
+          </S.RateBox>
+          <S.PeriodBtnWrapper>
+            <S.OneWeekBtn
+              onClick={() => handlePeriodChange("1_WEEK")}
+              $active={selectedPeriod === "1_WEEK"}
+            >
+              1 WEEK
+            </S.OneWeekBtn>
+            <S.ThreeMonthsBtn
+              onClick={() => handlePeriodChange("3_MONTHS")}
+              $active={selectedPeriod === "3_MONTHS"}
+            >
+              3 MONTHS
+            </S.ThreeMonthsBtn>
+            <S.OneYearBtn
+              onClick={() => handlePeriodChange("1_YEAR")}
+              $active={selectedPeriod === "1_YEAR"}
+            >
+              1 YEAR
+            </S.OneYearBtn>
+          </S.PeriodBtnWrapper>
+          <RateChart graphData={finalGraphData} onLoadComplete={handleChartLoad} />
+        </S.GraphWrapper>
+        <S.FeeBox>
+          <S.Title>{t("rates.feeComparison")}</S.Title>
+          {eachBankFee.map((item) => (
+            <S.FeeItem key={item.bank}>
+              <img src={bankLogos[item.bank]} />
+              <S.NameBox>
+                <S.Bank>{t(`banks.${item.bank}`)}</S.Bank>
+                <S.Fee>{formatFee(item.fee)}</S.Fee>
+              </S.NameBox>
+            </S.FeeItem>
+          ))}
+        </S.FeeBox>
+      </S.Container>
+    </>
   );
 }

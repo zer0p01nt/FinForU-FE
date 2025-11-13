@@ -5,6 +5,8 @@ import { useEffect, useState } from "react";
 import * as S from "./LoginStyle";
 import api from "../../api/api";
 import { LANGUAGE_MAP } from "../../constants/languageMap";
+import { Helmet } from "react-helmet-async";
+import { helmetTitle } from "../../constants/title";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -82,33 +84,38 @@ export default function Login() {
   };
 
   return (
-    <S.Container>
-      <S.Title>FinForU</S.Title>
-      <S.FormWrapper>
-        <S.Form onSubmit={handleSubmit}>
-          <div>
-            <S.EmailInput
-              placeholder={t("login.email")}
-              onChange={(e) => setEmail(e.target.value)}
-              value={email}
-              type="email"
-            />
-            <S.PWInput
-              placeholder={t("login.password")}
-              onChange={(e) => setPassword(e.target.value)}
-              value={password}
-              type="password"
-            />
-          </div>
-          <S.Btn $isLogin={true} type="submit">
-            {t("login.login")}
+    <>
+      <Helmet>
+        <title>Login{helmetTitle}</title>
+      </Helmet>
+      <S.Container>
+        <S.Title>FinForU</S.Title>
+        <S.FormWrapper>
+          <S.Form onSubmit={handleSubmit}>
+            <div>
+              <S.EmailInput
+                placeholder={t("login.email")}
+                onChange={(e) => setEmail(e.target.value)}
+                value={email}
+                type="email"
+              />
+              <S.PWInput
+                placeholder={t("login.password")}
+                onChange={(e) => setPassword(e.target.value)}
+                value={password}
+                type="password"
+              />
+            </div>
+            <S.Btn $isLogin={true} type="submit">
+              {t("login.login")}
+            </S.Btn>
+          </S.Form>
+          <S.Div></S.Div>
+          <S.Btn $isLogin={false} onClick={() => navigate("/join")}>
+            {t("login.join")}
           </S.Btn>
-        </S.Form>
-        <S.Div></S.Div>
-        <S.Btn $isLogin={false} onClick={() => navigate("/join")}>
-          {t("login.join")}
-        </S.Btn>
-      </S.FormWrapper>
-    </S.Container>
+        </S.FormWrapper>
+      </S.Container>
+    </>
   );
 }

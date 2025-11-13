@@ -188,6 +188,7 @@ export const TabButton = styled.button`
 export const AiPromptButton = styled.button`
   width: 100%;
   display: flex;
+  justify-content: center;
   align-items: center;
   gap: 0.75rem;
   padding: 0.5rem 1.25rem;

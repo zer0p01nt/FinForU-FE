@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import * as S from "../ProductStyle";
+import { useTranslation } from "react-i18next";
 
 const PRODUCT_TYPE_OPTIONS = [
   { id: "Card", label: "Card" },
@@ -52,6 +53,7 @@ export default function PreferenceEditorSheet({ isOpen, initialValues, onClose, 
   const [openDropdown, setOpenDropdown] = useState(null);
   const [renderSheet, setRenderSheet] = useState(isOpen);
   const [closing, setClosing] = useState(false);
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (!isOpen) return;
@@ -115,10 +117,10 @@ export default function PreferenceEditorSheet({ isOpen, initialValues, onClose, 
       <S.Sheet $closing={closing}>
         <S.SheetHandle onClick={onClose} role="button" aria-label="Close" />
         <S.SheetContent>
-          <S.SheetTitle>Edit Preferences</S.SheetTitle>
+          <S.SheetTitle>{t("product.editPreferences")}</S.SheetTitle>
           <S.PreferenceEditorSection>
-            <S.PreferenceEditorHeading>Desired Product Type</S.PreferenceEditorHeading>
-            <S.PreferenceEditorHint>Multiple selections possible</S.PreferenceEditorHint>
+            <S.PreferenceEditorHeading>{t("product.desiredProductType")}</S.PreferenceEditorHeading>
+            <S.PreferenceEditorHint>{t("multiSelect")}</S.PreferenceEditorHint>
             <S.PreferenceChipRow>
               {PRODUCT_TYPE_OPTIONS.map((option) => (
                 <S.PreferenceChip
@@ -134,8 +136,8 @@ export default function PreferenceEditorSheet({ isOpen, initialValues, onClose, 
           </S.PreferenceEditorSection>
 
           <S.PreferenceEditorSection>
-            <S.PreferenceEditorHeading>Savings Goal Period</S.PreferenceEditorHeading>
-            <S.PreferenceEditorHint>Multiple selections possible</S.PreferenceEditorHint>
+            <S.PreferenceEditorHeading>{t("product.savingsGoalPeriod")}</S.PreferenceEditorHeading>
+            <S.PreferenceEditorHint>{t("multiSelect")}</S.PreferenceEditorHint>
             <S.PreferenceChipRow>
               {SAVINGS_PERIOD_OPTIONS.map((option) => (
                 <S.PreferenceChip
@@ -152,14 +154,14 @@ export default function PreferenceEditorSheet({ isOpen, initialValues, onClose, 
           </S.PreferenceEditorSection>
 
           <S.PreferenceEditorSection>
-            <S.PreferenceEditorHeading>Savings Purpose</S.PreferenceEditorHeading>
+            <S.PreferenceEditorHeading>{t("product.savingsPurpose")}</S.PreferenceEditorHeading>
             <S.PreferenceSelect>
               <S.PreferenceSelectButton
                 type="button"
                 onClick={() => setOpenDropdown(openDropdown === "savings" ? null : "savings")}
               >
                 <S.PreferenceSelectLabel $placeholder={!savingsPurpose}>
-                  {savingsPurpose || "Please select"}
+                  {savingsPurpose || t("pleaseSelect")}
                 </S.PreferenceSelectLabel>
                 <S.PreferenceSelectArrow $open={openDropdown === "savings"}>
                   <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
@@ -195,14 +197,14 @@ export default function PreferenceEditorSheet({ isOpen, initialValues, onClose, 
           </S.PreferenceEditorSection>
 
           <S.PreferenceEditorSection>
-            <S.PreferenceEditorHeading>Card Usage Purpose</S.PreferenceEditorHeading>
+            <S.PreferenceEditorHeading>{t("product.cardUsagePurpose")}</S.PreferenceEditorHeading>
             <S.PreferenceSelect>
               <S.PreferenceSelectButton
                 type="button"
                 onClick={() => setOpenDropdown(openDropdown === "card" ? null : "card")}
               >
                 <S.PreferenceSelectLabel $placeholder={!cardPurpose}>
-                  {cardPurpose || "Please select"}
+                  {cardPurpose || t("pleaseSelect")}
                 </S.PreferenceSelectLabel>
                 <S.PreferenceSelectArrow $open={openDropdown === "card"}>
                   <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
@@ -257,14 +259,14 @@ export default function PreferenceEditorSheet({ isOpen, initialValues, onClose, 
           </S.PreferenceEditorSection>
 
           <S.PreferenceEditorSection>
-            <S.PreferenceEditorHeading>Preferred Bank (optional)</S.PreferenceEditorHeading>
+            <S.PreferenceEditorHeading>{t("product.preferredBank")}</S.PreferenceEditorHeading>
             <S.PreferenceSelect>
               <S.PreferenceSelectButton
                 type="button"
                 onClick={() => setOpenDropdown(openDropdown === "bank" ? null : "bank")}
               >
                 <S.PreferenceSelectLabel $placeholder={!preferredBank}>
-                  {preferredBank || "Please select"}
+                  {preferredBank || t("pleaseSelect")}
                 </S.PreferenceSelectLabel>
                 <S.PreferenceSelectArrow $open={openDropdown === "bank"}>
                   <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
@@ -301,10 +303,10 @@ export default function PreferenceEditorSheet({ isOpen, initialValues, onClose, 
         </S.SheetContent>
         <S.SheetFooter>
           <S.SecondaryButton type="button" onClick={onClose}>
-            Cancel
+            {t("cancel")}
           </S.SecondaryButton>
           <S.PrimaryButton type="button" onClick={handleSave} disabled={productTypes.length === 0}>
-            Confirm
+            {t("confirm")}
           </S.PrimaryButton>
         </S.SheetFooter>
       </S.Sheet>

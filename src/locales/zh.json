@@ -34,7 +34,7 @@
     "join": "注册",
     "email": "电子邮件",
     "password": "密码",
-    "8DigitNumber": "8位数字",
+    "8Characters": "至少8个字符",
     "passwordAgain": "请再次输入您的密码",
     "name": "姓名",
     "nationality": "国籍",
@@ -143,6 +143,7 @@
     "selectAccounts": "选择要比较的账户",
     "viewWebsite": "查看网站",
     "editPreferences": "编辑偏好",
+    "yourSummary": "您的偏好总结",
     "desiredProductType": "偏好的产品类型",
     "savingsGoalPeriod": "储蓄目标期限",
     "savingsPurpose": "储蓄目标",
@@ -163,7 +164,9 @@
     "preferredBank": "偏好的银行 (可选)",
     "purpose": "目的",
     "loginToSee": "登录以查看个性化推荐。",
-    "loginDesc": "登录后，我们的AI将为您找到最佳金融产品。"
+    "loginDesc": "登录后，我们的AI将为您找到最佳金融产品。",
+    "reset": "重置",
+    "done": "完成"
   },
   "rates": {
     "currencyExchangeRate": "货币汇率",

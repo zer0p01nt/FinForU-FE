@@ -86,6 +86,7 @@ export const TypeBtn = styled.button`
   font-weight: 500;
   height: 2.5rem;
   -webkit-tap-highlight-color: rgba(255, 255, 255, 0);
+  transition: all 0.2s ease;
 `;
 
 export const PeriodWrapper = styled.div`

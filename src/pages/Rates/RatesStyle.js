@@ -147,6 +147,7 @@ export const PeriodBtnWrapper = styled.div`
 export const BaseBtn = styled.button`
   color: ${({ $active }) => ($active ? "#000" : "#515151")};
   border-bottom: 1px solid ${({ $active }) => ($active ? "#282828" : "#d9d9d9")};
+  transition: all 0.2s ease;
 `;
 
 export const OneWeekBtn = styled(BaseBtn)`

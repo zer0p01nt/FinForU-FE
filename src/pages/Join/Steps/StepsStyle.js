@@ -77,6 +77,7 @@ export const Button = styled.button`
   height: 3.6875rem;
   /* 클릭하면 배경 파래지는 거 수정 */
   -webkit-tap-highlight-color: rgba(255, 255, 255, 0);
+  transition: all 0.2s ease;
 `;
 
 export const ToggleWrapper = styled.div`
@@ -148,6 +149,7 @@ export const ListTitle = styled.div`
 export const CheckBtn = styled.button`
   /* 클릭하면 배경 파래지는 거 수정 */
   -webkit-tap-highlight-color: rgba(255, 255, 255, 0);
+  transition: all 0.2s ease;
   svg path {
     fill: ${({ $checked }) => ($checked ? "var(--color-primary)" : "var(--color-input-gray)")};
   }

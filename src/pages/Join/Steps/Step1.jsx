@@ -105,7 +105,7 @@ export default function Step1({ formData, updateFormData, isSubmitted }) {
         <div>
           <S.PWInput
             type="password"
-            placeholder={t("join.8DigitNumber")}
+            placeholder={t("join.8Characters")}
             value={formData.password}
             onChange={(e) => updateFormData({ password: e.target.value })}
           />

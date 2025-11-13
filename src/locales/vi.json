@@ -34,7 +34,7 @@
     "join": "Đăng ký",
     "email": "Email",
     "password": "Mật khẩu",
-    "8DigitNumber": "Mã số 8 chữ số",
+    "8Characters": "Ít nhất 8 ký tự",
     "passwordAgain": "Vui lòng nhập lại mật khẩu",
     "name": "Tên",
     "nationality": "Quốc tịch",
@@ -143,6 +143,7 @@
     "selectAccounts": "Chọn tài khoản để so sánh",
     "viewWebsite": "Xem Trang web",
     "editPreferences": "Chỉnh sửa Ưu tiên",
+    "yourSummary": "Tóm tắt sở thích của bạn",
     "desiredProductType": "Loại sản phẩm mong muốn",
     "savingsGoalPeriod": "Thời gian mục tiêu tiết kiệm",
     "savingsPurpose": "Mục đích tiết kiệm",
@@ -163,7 +164,9 @@
     "preferredBank": "Ngân hàng ưu tiên (tùy chọn)",
     "purpose": "Mục đích",
     "loginToSee": "Đăng nhập để xem các đề xuất cá nhân hóa.",
-    "loginDesc": "AI của chúng tôi sẽ tìm các sản phẩm tài chính tốt nhất\ncho bạn sau khi bạn đăng nhập."
+    "loginDesc": "AI của chúng tôi sẽ tìm các sản phẩm tài chính tốt nhất\ncho bạn sau khi bạn đăng nhập.",
+    "reset": "thiết lập lại",
+    "done": "hoàn thành"
   },
   "rates": {
     "currencyExchangeRate": "Tỷ giá hối đoái tiền tệ",

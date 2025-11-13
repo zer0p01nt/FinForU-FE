@@ -3,6 +3,7 @@ import CompareIcon from "../icons/CompareIcon.svg";
 import LinkIcon from "../icons/LinkIcon.svg";
 import { getBankLogo } from "../Product";
 import * as S from "../ProductStyle";
+import { useTranslation } from "react-i18next";
 
 const getComparableNumericValue = (value, strategy) => {
   if (value == null) return null;
@@ -25,10 +26,7 @@ const getHighlightProductIds = (row, rowEntries) => {
   const validValues = comparableValues.filter((value) => value != null);
   if (validValues.length === 0) return new Set();
 
-  const target =
-    row.highlight === "min"
-      ? Math.min(...validValues)
-      : Math.max(...validValues);
+  const target = row.highlight === "min" ? Math.min(...validValues) : Math.max(...validValues);
 
   const highlightSet = new Set();
   comparableValues.forEach((value, index) => {
@@ -154,11 +152,7 @@ const getComparisonRows = (type, onVisitWebsite) => {
         label: "Monthly Limit",
         highlight: "min",
         get: (product) =>
-          findDetailValue(
-            product,
-            SECTION_ALIASES.depositDetails,
-            ROW_LABEL_ALIASES.monthlyLimit
-          ),
+          findDetailValue(product, SECTION_ALIASES.depositDetails, ROW_LABEL_ALIASES.monthlyLimit),
       },
       {
         id: "website",
@@ -220,11 +214,12 @@ function renderSelection({
   onProceed,
 }) {
   const isSelected = (productId) => selection.some((item) => item.id === productId);
+  const { t } = useTranslation();
 
   return (
     <>
       <S.CompareHeader>
-        <S.CompareTitle>Select products to compare</S.CompareTitle>
+        <S.CompareTitle>{t("product.selectAccounts")}</S.CompareTitle>
       </S.CompareHeader>
 
       <FilterBar
@@ -361,12 +356,7 @@ function renderResult({
           {comparisonRows.map((row) => {
             const rowEntries = orderedProducts.map((product) => ({
               product,
-              value:
-                row.type === "link"
-                  ? product.website
-                  : row.get
-                  ? row.get(product)
-                  : "",
+              value: row.type === "link" ? product.website : row.get ? row.get(product) : "",
             }));
             const highlightProductIds = getHighlightProductIds(row, rowEntries);
 
@@ -374,9 +364,7 @@ function renderResult({
               <S.CompareTableRow key={row.id} $columns={columnCount}>
                 {rowEntries.map(({ product, value }, index) => {
                   const hasContent =
-                    row.type === "list"
-                      ? Array.isArray(value) && value.length > 0
-                      : Boolean(value);
+                    row.type === "list" ? Array.isArray(value) && value.length > 0 : Boolean(value);
 
                   let content;
                   if (row.type === "link") {
@@ -401,9 +389,7 @@ function renderResult({
                       <S.CompareCellValue>-</S.CompareCellValue>
                     );
                   } else {
-                    content = (
-                      <S.CompareCellValue>{hasContent ? value : "-"}</S.CompareCellValue>
-                    );
+                    content = <S.CompareCellValue>{hasContent ? value : "-"}</S.CompareCellValue>;
                   }
 
                   return (

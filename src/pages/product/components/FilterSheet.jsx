@@ -1,6 +1,8 @@
+import { useTranslation } from "react-i18next";
 import * as S from "../ProductStyle";
 
 export default function FilterSheet({ config, filters, onSelect, onReset, onClose }) {
+  const { t } = useTranslation();
   if (!config) return null;
 
   return (
@@ -21,10 +23,10 @@ export default function FilterSheet({ config, filters, onSelect, onReset, onClos
         </S.OptionList>
         <S.SheetFooter>
           <S.SecondaryButton type="button" onClick={() => onReset(config.key)}>
-            Reset
+            {t("product.reset")}
           </S.SecondaryButton>
           <S.PrimaryButton type="button" onClick={onClose}>
-            Done
+            {t("product.done")}
           </S.PrimaryButton>
         </S.SheetFooter>
       </S.Sheet>

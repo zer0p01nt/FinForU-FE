@@ -17,26 +17,32 @@ import shinhanLogo from "../Rates/icon/shinhan.png";
 import hanaLogo from "../Rates/icon/hana.png";
 import kookminLogo from "../Rates/icon/kookmin.png";
 import wooriLogo from "../Rates/icon/woori.png";
+import { Helmet } from "react-helmet-async";
+import { helmetTitle } from "../../constants/title";
 
 // 은행 이름을 로고로 매핑하는 함수
 export const getBankLogo = (bankName) => {
   if (!bankName) return null;
-  
+
   const bankNameLower = bankName.toLowerCase();
-  
+
   if (bankNameLower.includes("shinhan") || bankNameLower === "shinhan bank") {
     return shinhanLogo;
   }
   if (bankNameLower.includes("hana") || bankNameLower === "hana bank") {
     return hanaLogo;
   }
-  if (bankNameLower.includes("kookmin") || bankNameLower.includes("kb") || bankNameLower === "kb bank") {
+  if (
+    bankNameLower.includes("kookmin") ||
+    bankNameLower.includes("kb") ||
+    bankNameLower === "kb bank"
+  ) {
     return kookminLogo;
   }
   if (bankNameLower.includes("woori") || bankNameLower === "woori bank") {
     return wooriLogo;
   }
-  
+
   return null;
 };
 
@@ -202,7 +208,10 @@ const normalizePreferenceArray = (values, labelsMap) => {
   if (!Array.isArray(values)) return [];
   return values
     .map((value) => labelsMap[value] ?? value)
-    .filter((value, index, array) => typeof value === "string" && value.trim().length > 0 && array.indexOf(value) === index);
+    .filter(
+      (value, index, array) =>
+        typeof value === "string" && value.trim().length > 0 && array.indexOf(value) === index
+    );
 };
 
 const derivePeriodKey = (termMonths) => {
@@ -255,9 +264,17 @@ const buildDepositProduct = (item) => {
   const period = derivePeriodKey(item.termMonths);
   const termLabel = formatTermLabel(item.termMonths);
   const highlight =
-    maxRate !== null ? `Up to ${formatRateValue(maxRate)}` : item.isFlexible ? "Flexible deposit" : "Fixed deposit";
+    maxRate !== null
+      ? `Up to ${formatRateValue(maxRate)}`
+      : item.isFlexible
+        ? "Flexible deposit"
+        : "Fixed deposit";
   const featureLead =
-    maxRate !== null ? `Earn up to ${formatRateValue(maxRate)}` : item.isFlexible ? "Enjoy flexible deposits" : "Explore this deposit";
+    maxRate !== null
+      ? `Earn up to ${formatRateValue(maxRate)}`
+      : item.isFlexible
+        ? "Enjoy flexible deposits"
+        : "Explore this deposit";
 
   return {
     id: `deposit-${item.id}`,
@@ -307,7 +324,11 @@ const buildSavingProduct = (item) => {
     highlightParts.push(`₩${item.maxMonthly.toLocaleString()} monthly`);
   }
   const featureLead =
-    maxRate !== null ? `Save regularly and earn up to ${formatRateValue(maxRate)}` : item.isFlexible ? "Flexible savings option" : "Regular savings plan";
+    maxRate !== null
+      ? `Save regularly and earn up to ${formatRateValue(maxRate)}`
+      : item.isFlexible
+        ? "Flexible savings option"
+        : "Regular savings plan";
 
   return {
     id: `saving-${item.id}`,
@@ -322,7 +343,8 @@ const buildSavingProduct = (item) => {
       max: typeof maxRate === "number" ? maxRate : typeof minRate === "number" ? minRate : 0,
     },
     termLabel,
-    highlight: highlightParts.join(" · ") || (item.isFlexible ? "Flexible savings" : "Installment savings"),
+    highlight:
+      highlightParts.join(" · ") || (item.isFlexible ? "Flexible savings" : "Installment savings"),
     keyFeatures: `${featureLead} over a ${termLabel.toLowerCase()}.`,
     description: item.isFlexible ? "Flexible savings account." : "Regular savings plan.",
     tags: [],
@@ -338,7 +360,8 @@ const buildSavingProduct = (item) => {
           { label: "Flexible", value: item.isFlexible ? "Yes" : "No" },
           {
             label: "Monthly Limit",
-            value: typeof item.maxMonthly === "number" ? `₩${item.maxMonthly.toLocaleString()}` : "-",
+            value:
+              typeof item.maxMonthly === "number" ? `₩${item.maxMonthly.toLocaleString()}` : "-",
           },
         ],
       },
@@ -368,27 +391,27 @@ const buildCardComparisonProducts = (items = [], highlights = {}) =>
 
     const benefitRows = Array.isArray(item.benefit)
       ? item.benefit.map((benefit, index) => ({
-        label: `Benefit ${index + 1}`,
-        value: benefit,
-      }))
+          label: `Benefit ${index + 1}`,
+          value: benefit,
+        }))
       : [];
 
     return {
       id: `compare-card-${item.id}`,
       sourceId: item.id,
-    type: "card",
+      type: "card",
       name: item.name,
       bankName: item.bank,
       website: item.website,
-    detailSections: [
-      {
-        title: "Annual Fee",
-        rows: [
+      detailSections: [
+        {
+          title: "Annual Fee",
+          rows: [
             { label: "Domestic", value: domesticFee },
             { label: "International", value: internationalFee },
-        ],
-      },
-      {
+          ],
+        },
+        {
           title: "Benefits",
           rows: benefitRows,
         },
@@ -418,17 +441,17 @@ const buildDepositComparisonProducts = (items = [], highlights = {}) =>
       name: item.name,
       bankName: item.bank,
       website: item.website,
-    detailSections: [
-      {
-        title: "Interest Rate",
-        rows: [
+      detailSections: [
+        {
+          title: "Interest Rate",
+          rows: [
             { label: "Base Rate", value: baseRate },
             { label: "Maximum Rate", value: maxRate },
-        ],
-      },
-      {
+          ],
+        },
+        {
           title: "Deposit Details",
-        rows: [
+          rows: [
             { label: "Deposit Term", value: formatTermLabel(item.termMonths) },
             { label: "Flexible", value: item.isFlexible ? "Yes" : "No" },
             { label: "Minimum Deposit", value: minDeposit },
@@ -460,17 +483,17 @@ const buildSavingComparisonProducts = (items = [], highlights = {}) =>
       name: item.name,
       bankName: item.bank,
       website: item.website,
-    detailSections: [
-      {
+      detailSections: [
+        {
           title: "Interest Rate",
-        rows: [
+          rows: [
             { label: "Base Rate", value: baseRate },
             { label: "Maximum Rate", value: maxRate },
-        ],
-      },
-      {
+          ],
+        },
+        {
           title: "Deposit Details",
-        rows: [
+          rows: [
             { label: "Deposit Term", value: formatTermLabel(item.termMonths) },
             { label: "Flexible", value: item.isFlexible ? "Yes" : "No" },
             { label: "Monthly Limit", value: monthlyLimit },
@@ -509,7 +532,6 @@ const normalizeComparisonResponse = (type, payload) => {
   }
 };
 
-
 const INITIAL_FILTERS = {
   bank: null,
   productType: null,
@@ -541,7 +563,7 @@ const matchesProductFilters = (product, activeFilters) => {
             : typeof range.min === "number" && !Number.isNaN(range.min)
               ? range.min
               : 0;
-      matchInterest = midValue >= option.min && midValue <= option.max;
+        matchInterest = midValue >= option.min && midValue <= option.max;
       }
     }
   }
@@ -566,7 +588,10 @@ const mapPreferencesResponse = (data) => {
 
   const productTypes = normalizePreferenceArray(data.types, PREFERENCE_TYPE_LABELS);
   const savingsPeriods = normalizePreferenceArray(data.periods, PREFERENCE_PERIOD_LABELS);
-  const savingsPurpose = normalizePreferenceValue(data.savingPurpose, PREFERENCE_SAVING_PURPOSE_LABELS);
+  const savingsPurpose = normalizePreferenceValue(
+    data.savingPurpose,
+    PREFERENCE_SAVING_PURPOSE_LABELS
+  );
   const cardPurpose = normalizePreferenceValue(data.cardPurpose, PREFERENCE_CARD_PURPOSE_LABELS);
   const incomeLevel = normalizePreferenceValue(data.income, PREFERENCE_INCOME_LABELS);
   const preferredBank = normalizePreferenceValue(data.bank, PREFERENCE_BANK_LABELS);
@@ -624,7 +649,7 @@ export default function Product() {
   useEffect(() => {
     if (isCompareRoute) {
       setHeaderConfig({
-        title: "Compare",
+        title: t("product.compare"),
         showBackBtn: true,
         showSettingBtn: false,
       });
@@ -649,7 +674,7 @@ export default function Product() {
     const typeKey = API_PRODUCT_TYPE_MAP[detailProduct.type];
     // sourceId 추출: sourceId > raw.id > id에서 숫자 추출
     let sourceId = detailProduct.sourceId ?? detailProduct.raw?.id;
-    
+
     // sourceId가 없으면 id에서 숫자 부분 추출 (예: "card-123" -> "123")
     if (!sourceId && detailProduct.id) {
       const match = detailProduct.id.match(/\d+$/);
@@ -726,8 +751,10 @@ export default function Product() {
   const [aiPreferences, setAiPreferences] = useState(() => ({ ...EMPTY_PREFERENCES }));
   const [isPreferenceSheetOpen, setPreferenceSheetOpen] = useState(false);
 
-
-  const matchesFilterChips = useCallback((product) => matchesProductFilters(product, filters), [filters]);
+  const matchesFilterChips = useCallback(
+    (product) => matchesProductFilters(product, filters),
+    [filters]
+  );
   const matchesCompareFilterChips = useCallback(
     (product) => matchesProductFilters(product, compareFilters),
     [compareFilters]
@@ -744,7 +771,8 @@ export default function Product() {
 
     setCompareSelection((prev) => {
       const next = prev.filter(
-        (item) => savedProducts.some((saved) => saved.id === item.id) && matchesCompareFilterChips(item)
+        (item) =>
+          savedProducts.some((saved) => saved.id === item.id) && matchesCompareFilterChips(item)
       );
       if (next.length === prev.length) {
         return prev;
@@ -805,7 +833,10 @@ export default function Product() {
     return option ? option.label : config.label;
   }, []);
 
-  const getFilterLabel = useCallback((key) => getFilterLabelFor(filters, key), [filters, getFilterLabelFor]);
+  const getFilterLabel = useCallback(
+    (key) => getFilterLabelFor(filters, key),
+    [filters, getFilterLabelFor]
+  );
   const getCompareFilterLabel = useCallback(
     (key) => getFilterLabelFor(compareFilters, key),
     [compareFilters, getFilterLabelFor]
@@ -880,7 +911,9 @@ export default function Product() {
 
       const effectiveBase = compareBaseType ?? prev[0]?.type ?? null;
       if (effectiveBase && effectiveBase !== product.type) {
-        setFloatingNotice("Comparisons are only valid between financial products of the same type.");
+        setFloatingNotice(
+          "Comparisons are only valid between financial products of the same type."
+        );
         return prev;
       }
 
@@ -915,9 +948,7 @@ export default function Product() {
       return;
     }
 
-    const productIds = compareSelection.map(
-      (item) => item.sourceId ?? item.raw?.id ?? item.id
-    );
+    const productIds = compareSelection.map((item) => item.sourceId ?? item.raw?.id ?? item.id);
 
     setCompareStage("result");
     setComparisonProducts([]);
@@ -996,8 +1027,18 @@ export default function Product() {
     window.open(url, "_blank", "noopener,noreferrer");
   };
 
+  // title 설정
+  const productPageTitle = isCompareRoute
+    ? `Compare${helmetTitle}`
+    : isDetailRoute
+      ? `${detailProduct.name}${helmetTitle}`
+      : `Product${helmetTitle}`;
+
   return (
     <>
+      <Helmet>
+        <title>{productPageTitle}</title>
+      </Helmet>
       <S.Container>
         {isCompareRoute ? (
           <ComparePage
@@ -1036,7 +1077,7 @@ export default function Product() {
               <S.SearchInput
                 value={searchTerm}
                 onChange={(event) => setSearchTerm(event.target.value)}
-                placeholder="Search"
+                placeholder={t("product.search")}
                 aria-label="Search products"
               />
               <S.SearchIcon>
@@ -1056,7 +1097,14 @@ export default function Product() {
                     strokeLinejoin="round"
                   />
                   <defs>
-                    <linearGradient id="gradient" x1="2.5" y1="2.5" x2="18" y2="17.5" gradientUnits="userSpaceOnUse">
+                    <linearGradient
+                      id="gradient"
+                      x1="2.5"
+                      y1="2.5"
+                      x2="18"
+                      y2="17.5"
+                      gradientUnits="userSpaceOnUse"
+                    >
                       <stop stopColor="#009CEA" />
                     </linearGradient>
                   </defs>
@@ -1066,10 +1114,10 @@ export default function Product() {
 
             <S.TabList>
               <S.TabButton $active={selectedTab === "all"} onClick={() => setSelectedTab("all")}>
-                All Products
+                {t("product.allProducts")}
               </S.TabButton>
               <S.TabButton $active={selectedTab === "ai"} onClick={() => setSelectedTab("ai")}>
-                AI Recommended
+                {t("product.aiRecommended")}
               </S.TabButton>
             </S.TabList>
 
@@ -1078,7 +1126,7 @@ export default function Product() {
                 <S.AiPromptIcon>
                   <img src={RecommendIcon} alt="" width={24} height={24} />
                 </S.AiPromptIcon>
-                Ask AI to recommend a product
+                {t("product.askAI")}
               </S.AiPromptButton>
             )}
 
@@ -1086,23 +1134,21 @@ export default function Product() {
               isProductsLoading ? (
                 <S.EmptyState>Loading products...</S.EmptyState>
               ) : productsError ? (
-                <S.EmptyState>
-                  Failed to load products. Please try again later.
-                </S.EmptyState>
+                <S.EmptyState>Failed to load products. Please try again later.</S.EmptyState>
               ) : (
-              <AllProductsSection
-                filterConfig={FILTER_CONFIG}
-                filterOrder={FILTER_SEQUENCE}
-                filters={filters}
-                getFilterLabel={getFilterLabel}
-                onFilterSelect={handleFilterSelect}
-                onFilterReset={handleFilterReset}
-                hasActiveFilters={hasActiveFilters}
-                onResetAllFilters={handleResetAllFilters}
-                products={filteredProducts}
-                onProductClick={handleNavigateToDetail}
-                onCompareToggle={handleCompareToggle}
-              />
+                <AllProductsSection
+                  filterConfig={FILTER_CONFIG}
+                  filterOrder={FILTER_SEQUENCE}
+                  filters={filters}
+                  getFilterLabel={getFilterLabel}
+                  onFilterSelect={handleFilterSelect}
+                  onFilterReset={handleFilterReset}
+                  hasActiveFilters={hasActiveFilters}
+                  onResetAllFilters={handleResetAllFilters}
+                  products={filteredProducts}
+                  onProductClick={handleNavigateToDetail}
+                  onCompareToggle={handleCompareToggle}
+                />
               )
             ) : (
               <RecommendationsSection
