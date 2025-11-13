@@ -4,7 +4,6 @@ import { useHeaderStore } from "../../stores/headerStore";
 import { useEffect, useState, useRef } from "react";
 import api from "../../api/api";
 import * as S from "./GuideStyle";
-import { Helmet } from "react-helmet-async";
 import { helmetTitle } from "../../constants/title";
 
 const fetchGuideMain = async () => {
@@ -164,9 +163,7 @@ export default function Guide() {
 
   return (
     <>
-      <Helmet>
-        <title>Guide{helmetTitle}</title>
-      </Helmet>
+      <title>Guide{helmetTitle}</title>
       <S.Container>
         <S.ChatArea ref={chatAreaRef}>
           <S.WelcomeMessage>

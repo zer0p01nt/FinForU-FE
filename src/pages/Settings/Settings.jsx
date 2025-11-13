@@ -5,7 +5,6 @@ import * as S from "./SettingsStyle";
 import { useNavigate } from "react-router-dom";
 import api from "../../api/api";
 import GoToLogin from "../../components/go-to-login/GoToLogin";
-import { Helmet } from "react-helmet-async";
 import { helmetTitle } from "../../constants/title";
 
 export default function Settings() {
@@ -33,9 +32,7 @@ export default function Settings() {
   // return <GoToLogin />;
   return (
     <>
-      <Helmet>
-        <title>Settings{helmetTitle}</title>
-      </Helmet>
+      <title>Settings{helmetTitle}</title>
       <S.Container>
         <S.Btn onClick={() => navigate("/settings/edit-information")}>
           <div>

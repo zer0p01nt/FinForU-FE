@@ -15,7 +15,6 @@ import GlobeIcon from "./icons/GlobeIcon.svg?react";
 import LocationIcon from "./icons/LocationIcon.svg?react";
 import TimeIcon from "./icons/TimeIcon.svg?react";
 import PinIcon from "./icons/PinIcon.svg";
-import { Helmet } from "react-helmet-async";
 import { helmetTitle } from "../../constants/title";
 
 // 카카오맵 API 키 (.env)
@@ -1010,9 +1009,7 @@ export default function Map() {
 
   return (
     <>
-      <Helmet>
-        <title>Map{helmetTitle}</title>
-      </Helmet>
+      <title>Map{helmetTitle}</title>
       <S.Container>
         <S.FilterSection>
           <S.FilterRow>

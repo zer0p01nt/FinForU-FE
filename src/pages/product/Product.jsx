@@ -17,7 +17,6 @@ import shinhanLogo from "../Rates/icon/shinhan.png";
 import hanaLogo from "../Rates/icon/hana.png";
 import kookminLogo from "../Rates/icon/kookmin.png";
 import wooriLogo from "../Rates/icon/woori.png";
-import { Helmet } from "react-helmet-async";
 import { helmetTitle } from "../../constants/title";
 
 // 은행 이름을 로고로 매핑하는 함수
@@ -1036,9 +1035,7 @@ export default function Product() {
 
   return (
     <>
-      <Helmet>
-        <title>{productPageTitle}</title>
-      </Helmet>
+      <title>{productPageTitle}</title>
       <S.Container>
         {isCompareRoute ? (
           <ComparePage

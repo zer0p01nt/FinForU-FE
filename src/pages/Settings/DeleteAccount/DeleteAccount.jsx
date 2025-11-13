@@ -3,7 +3,6 @@ import { useHeaderStore } from "../../../stores/headerStore";
 import { useTranslation } from "react-i18next";
 import * as S from "./DeleteAccountStyle";
 import DeleteModal from "./DeleteModal/DeleteModal";
-import { Helmet } from "react-helmet-async";
 import { helmetTitle } from "../../../constants/title";
 
 export default function DeleteAccount() {
@@ -23,9 +22,7 @@ export default function DeleteAccount() {
   const closeModal = useCallback(() => setIsModalOpen(false), []);
   return (
     <>
-      <Helmet>
-        <title>Delete Account{helmetTitle}</title>
-      </Helmet>
+      <title>Delete Account{helmetTitle}</title>
       <S.Container>
         {isModalOpen && <DeleteModal onClose={closeModal} />}
         <S.Title>{t("settings.deleteDesc")}</S.Title>

@@ -5,7 +5,6 @@ import { useEffect, useState } from "react";
 import * as S from "./LoginStyle";
 import api from "../../api/api";
 import { LANGUAGE_MAP } from "../../constants/languageMap";
-import { Helmet } from "react-helmet-async";
 import { helmetTitle } from "../../constants/title";
 
 export default function Login() {
@@ -85,9 +84,8 @@ export default function Login() {
 
   return (
     <>
-      <Helmet>
-        <title>Login{helmetTitle}</title>
-      </Helmet>
+      <title>Login{helmetTitle}</title>
+
       <S.Container>
         <S.Title>FinForU</S.Title>
         <S.FormWrapper>

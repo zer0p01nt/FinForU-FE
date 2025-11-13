@@ -12,7 +12,6 @@ import hanaLogo from "./icon/hana.png";
 import kookminLogo from "./icon/kookmin.png";
 import wooriLogo from "./icon/woori.png";
 import LoadingSpinner from "../../components/loading-spinner/LoadingSpinner";
-import { Helmet } from "react-helmet-async";
 import { helmetTitle } from "../../constants/title";
 // 매핑 파일
 const bankLogos = {
@@ -190,9 +189,7 @@ export default function Rates() {
 
   return (
     <>
-      <Helmet>
-        <title>Rates{helmetTitle}</title>
-      </Helmet>
+      <title>Rates{helmetTitle}</title>
       <S.Container>
         {isDataReady && <LoadingSpinner />}
         <S.TopBox>

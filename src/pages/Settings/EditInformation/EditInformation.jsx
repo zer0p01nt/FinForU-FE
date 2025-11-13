@@ -11,7 +11,6 @@ import ButtonGroup from "../../../components/button-group/ButtonGroup";
 import { useNavigate } from "react-router-dom";
 import api from "../../../api/api";
 import LoadingSpinner from "../../../components/loading-spinner/LoadingSpinner";
-import { Helmet } from "react-helmet-async";
 import { helmetTitle } from "../../../constants/title";
 
 export default function EditInformation() {
@@ -26,6 +25,7 @@ export default function EditInformation() {
   const [newPassword, setNewPassword] = useState("");
   const [isNotifyOn, setIsNotifyOn] = useState(true);
   const [isLoading, setIsLoading] = useState(true); // 초기 API 호출 시작 시 true
+  const [initialNotifyStatus, setInitialNotifyStatus] = useState(true);
 
   // 헤더 설정
   const setHeaderConfig = useHeaderStore((state) => state.setHeaderConfig);
@@ -274,9 +274,7 @@ export default function EditInformation() {
 
   return (
     <>
-      <Helmet>
-        <title>Edit Information{helmetTitle}</title>
-      </Helmet>
+      <title>Edit Information{helmetTitle}</title>
       <S.Container>
         {isLoading && <LoadingSpinner />}
         <J.Label>

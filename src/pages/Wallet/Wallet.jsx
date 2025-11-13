@@ -7,7 +7,6 @@ import WalletModal from "./WalletModal/WalletModal";
 import DeleteModal from "./DeleteModal/DeleteModal";
 import api from "../../api/api";
 import LoadingSpinner from "../../components/loading-spinner/LoadingSpinner";
-import { Helmet } from "react-helmet-async";
 import { helmetTitle } from "../../constants/title";
 
 const initialWalletData = {
@@ -95,9 +94,7 @@ export default function Wallet() {
   // return <GoToLogin />;
   return (
     <>
-      <Helmet>
-        <title>Wallet{helmetTitle}</title>
-      </Helmet>
+      <title>Wallet{helmetTitle}</title>
       <S.Container>
         {isDataLoading && <LoadingSpinner />}
         {modalState.isOpen &&
