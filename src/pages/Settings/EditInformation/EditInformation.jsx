@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 
 import * as S from "./EditInformationStyle";
 import * as J from "../../Join/Steps/StepsStyle";
-import Dropdown from "../../../components/dropdown/DropDown";
+import Dropdown from "../../../components/dropdown/Dropdown";
 import MultiSelectHeader from "../../../components/multi-select-header/MultiSelectHeader";
 import ToggleSwitch from "../../../components/toggle-switch/ToggleSwitch";
 import ButtonGroup from "../../../components/button-group/ButtonGroup";
