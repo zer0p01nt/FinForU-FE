@@ -32,7 +32,7 @@ export default function Settings() {
   // return <GoToLogin />;
   return (
     <>
-      <title>Settings{helmetTitle}</title>
+      <title>{`Settings${helmetTitle}`}</title>
       <S.Container>
         <S.Btn onClick={() => navigate("/settings/edit-information")}>
           <div>

@@ -94,7 +94,7 @@ export default function Wallet() {
   // return <GoToLogin />;
   return (
     <>
-      <title>Wallet{helmetTitle}</title>
+      <title>{`Wallet${helmetTitle}`}</title>
       <S.Container>
         {isDataLoading && <LoadingSpinner />}
         {modalState.isOpen &&

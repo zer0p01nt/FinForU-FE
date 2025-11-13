@@ -1009,7 +1009,7 @@ export default function Map() {
 
   return (
     <>
-      <title>Map{helmetTitle}</title>
+      <title>{`Map${helmetTitle}`}</title>
       <S.Container>
         <S.FilterSection>
           <S.FilterRow>

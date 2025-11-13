@@ -84,7 +84,7 @@ export default function Login() {
 
   return (
     <>
-      <title>Login{helmetTitle}</title>
+      <title>{`Login${helmetTitle}`}</title>
 
       <S.Container>
         <S.Title>FinForU</S.Title>

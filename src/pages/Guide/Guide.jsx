@@ -163,7 +163,7 @@ export default function Guide() {
 
   return (
     <>
-      <title>Guide{helmetTitle}</title>
+      <title>{`Guide${helmetTitle}`}</title>
       <S.Container>
         <S.ChatArea ref={chatAreaRef}>
           <S.WelcomeMessage>

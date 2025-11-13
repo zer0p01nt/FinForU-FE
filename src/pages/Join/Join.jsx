@@ -12,7 +12,7 @@ import api from "../../api/api";
 import Loading from "./Loading/Loading";
 import Complete from "./Loading/Complete";
 import { helmetTitle } from "../../constants/title";
-import { Helmet } from "react-helmet-async";
+import { useFCMTokenRegistration } from "../../hooks/useFCMTokenRegistration";
 
 const TOTAL_STEPS = 3;
 
@@ -32,9 +32,12 @@ export default function Join() {
   });
   const [isLoading, setIsLoading] = useState(false);
   const [isCompleted, setIsCompleted] = useState(false);
-
+  const [newMemberId, setNewMemberId] = useState(null); // 알림 설정을 위한 상태 추가
   // 유효성 검사가 Next 클릭으로 인해 실행되었는지 여부
   const [isSubmitted, setIsSubmitted] = useState(false);
+
+  // memberId로 FCM 토큰 등록 훅 호출
+  useFCMTokenRegistration(formData.notify, newMemberId);
 
   // 현재 스텝의 유효성 상태 계산
   const isCurrentStepValid = useMemo(() => {
@@ -149,6 +152,9 @@ export default function Join() {
 
       // 회원가입 성공
       if (res.status === 200) {
+        // memberId 추출
+        const memberIdFromRes = res.data.memberId;
+        setNewMemberId(memberIdFromRes);
         setIsLoading(false);
         setIsCompleted(true);
       }
@@ -191,9 +197,7 @@ export default function Join() {
 
   return (
     <>
-      <Helmet>
-        <title>Join{helmetTitle}</title>
-      </Helmet>
+      <title>{`Join${helmetTitle}`}</title>
       <S.Container>
         <S.IndicatorWrapper>
           <S.Indicator>

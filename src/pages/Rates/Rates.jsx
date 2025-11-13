@@ -189,7 +189,7 @@ export default function Rates() {
 
   return (
     <>
-      <title>Rates{helmetTitle}</title>
+      <title>{`Rates${helmetTitle}`}</title>
       <S.Container>
         {isDataReady && <LoadingSpinner />}
         <S.TopBox>

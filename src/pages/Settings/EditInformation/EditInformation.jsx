@@ -12,6 +12,7 @@ import { useNavigate } from "react-router-dom";
 import api from "../../../api/api";
 import LoadingSpinner from "../../../components/loading-spinner/LoadingSpinner";
 import { helmetTitle } from "../../../constants/title";
+import { requestForToken } from "../../../firebase";
 
 export default function EditInformation() {
   const navigate = useNavigate();
@@ -25,7 +26,7 @@ export default function EditInformation() {
   const [newPassword, setNewPassword] = useState("");
   const [isNotifyOn, setIsNotifyOn] = useState(true);
   const [isLoading, setIsLoading] = useState(true); // 초기 API 호출 시작 시 true
-  const [initialNotifyStatus, setInitialNotifyStatus] = useState(true);
+  const [initialNotifyStatus, setInitialNotifyStatus] = useState(true); // 초기 알림 상태 저장
 
   // 헤더 설정
   const setHeaderConfig = useHeaderStore((state) => state.setHeaderConfig);
@@ -65,7 +66,9 @@ export default function EditInformation() {
           visaExpir: formattedVisaExpir,
           desiredProducts: userData.desiredProductTypes,
         });
-        setIsNotifyOn(userData.notify ?? true);
+        const currentNotify = userData.notify ?? true;
+        setIsNotifyOn(currentNotify);
+        setInitialNotifyStatus(currentNotify);
       } catch (error) {
         alert("Failed to get user information.");
         console.error(error);
@@ -249,8 +252,56 @@ export default function EditInformation() {
 
         // 실제 API 호출: PATCH 또는 PUT
         await api.patch("/api/members/me", newData);
+        const memberId = formData.memberId || formData.id || formData.member_id;
+
+        // 알림 설정 변경 로직
+        if (memberId) {
+          // true -> false
+          if (initialNotifyStatus === true && isNotifyOn === false) {
+            console.log("Notification turned OFF. Deactivating FCM token...");
+            try {
+              const fcmToken = await requestForToken();
+              if (fcmToken) {
+                const deactivateData = { memberid: memberId, token: fcmToken };
+                await api.post("/api/push/deactivate", deactivateData);
+                console.log(`FCM Token deactivated successfully for member: ${memberId}`);
+              }
+            } catch (error) {
+              console.error("Failed to deactivate FCM token:", error);
+            }
+          }
+
+          // false -> true
+          else if (initialNotifyStatus === false && isNotifyOn === true) {
+            console.log("Notification turned ON. Registering FCM token...");
+            try {
+              // 알림 권한 요청 (만약 이전에 거부했다면 다시 요청)
+              if (Notification.permission === "default") {
+                await Notification.requestPermission();
+              }
+
+              if (Notification.permission === "granted") {
+                const fcmToken = await requestForToken();
+                if (fcmToken) {
+                  const registerData = { memberid: memberId, token: fcmToken };
+                  await api.post("/api/push/register", registerData);
+                  console.log(`FCM Token registered successfully for member: ${memberId}`);
+                } else {
+                  console.warn("FCM Token not available, cannot register push notifications.");
+                }
+              } else {
+                console.warn("Cannot register token: Notification permission is denied by user.");
+              }
+            } catch (error) {
+              console.error("Failed to register FCM token:", error);
+            }
+          }
+        } else {
+          console.error("Member ID not found for token activation/deactivation.");
+        }
 
         alert("Your changed information has been saved successfully.");
+        setInitialNotifyStatus(isNotifyOn);
         navigate(-1);
       } catch (error) {
         setIsLoading(false);
@@ -274,7 +325,7 @@ export default function EditInformation() {
 
   return (
     <>
-      <title>Edit Information{helmetTitle}</title>
+      <title>{`Edit Information${helmetTitle}`}</title>
       <S.Container>
         {isLoading && <LoadingSpinner />}
         <J.Label>

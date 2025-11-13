@@ -1035,7 +1035,7 @@ export default function Product() {
 
   return (
     <>
-      <title>{productPageTitle}</title>
+      <title>{`${productPageTitle}${helmetTitle}`}</title>
       <S.Container>
         {isCompareRoute ? (
           <ComparePage

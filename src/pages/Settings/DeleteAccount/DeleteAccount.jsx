@@ -22,7 +22,7 @@ export default function DeleteAccount() {
   const closeModal = useCallback(() => setIsModalOpen(false), []);
   return (
     <>
-      <title>Delete Account{helmetTitle}</title>
+      <title>{`Delete Account${helmetTitle}`}</title>
       <S.Container>
         {isModalOpen && <DeleteModal onClose={closeModal} />}
         <S.Title>{t("settings.deleteDesc")}</S.Title>
