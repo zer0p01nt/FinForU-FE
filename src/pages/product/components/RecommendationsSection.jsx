@@ -28,8 +28,8 @@ export default function RecommendationsSection({
           >
             {t("product.loginToSee")}
           </div>
-          {loginDesc.map((text) => (
-            <div style={{ fontSize: "0.8rem", color: "#000" }}>{text}</div>
+          {loginDesc.map((text, index) => (
+            <div key={index} style={{ fontSize: "0.8rem", color: "#000" }}>{text}</div>
           ))}
         </div>
         <S.PrimaryButton type="button" style={{ width: "100%" }} onClick={onLogin}>

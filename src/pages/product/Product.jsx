@@ -1064,7 +1064,6 @@ export default function Product() {
   const loadPreferences = useCallback(async () => {
     try {
       const loggedIn = await checkLoginStatus();
-      setIsLoggedIn(loggedIn);
       
       try {
         const guestToken = loggedIn ? null : getOrCreateGuestToken();
@@ -1095,26 +1094,41 @@ export default function Product() {
         setAiPreferences({ ...EMPTY_PREFERENCES });
       }
     } catch (error) {
-      setIsLoggedIn(false);
+      // 로그인 상태는 useAuthStore에서 관리
     }
   }, []);
+
+  const login = useAuthStore((state) => state.login);
+  const logout = useAuthStore((state) => state.logout);
 
   useEffect(() => {
     const checkAuth = async () => {
       setIsCheckingLogin(true);
       try {
         const loggedIn = await checkLoginStatus();
-        setIsLoggedIn(loggedIn);
+        if (loggedIn) {
+          // 로그인 상태 확인 성공 시 useAuthStore 업데이트
+          try {
+            const response = await api.get("/api/members/me");
+            if (response.status === 200 && response.data?.data) {
+              login(response.data.data);
+            }
+          } catch (error) {
+            logout();
+          }
+        } else {
+          logout();
+        }
         await loadPreferences();
       } catch (error) {
-        setIsLoggedIn(false);
+        logout();
       } finally {
         setIsCheckingLogin(false);
       }
     };
 
     checkAuth();
-  }, [loadPreferences]);
+  }, [loadPreferences, login, logout]);
 
   useEffect(() => {
     const handleFocus = () => {
@@ -1147,7 +1161,7 @@ export default function Product() {
   const [isSavedProductsLoading, setIsSavedProductsLoading] = useState(false);
   const [savedProductsError, setSavedProductsError] = useState(null);
   const [floatingNotice, setFloatingNotice] = useState(null);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const isLoggedIn = useAuthStore((state) => state.isLoggedIn);
   const [isCheckingLogin, setIsCheckingLogin] = useState(true);
   const [aiPreferences, setAiPreferences] = useState(() => ({ ...EMPTY_PREFERENCES }));
   const [isPreferenceSheetOpen, setPreferenceSheetOpen] = useState(false);

@@ -1194,3 +1194,59 @@ export const DetailBlock = styled.div`
   flex-direction: column;
   gap: 0.5rem;
 `;
+
+export const LoginPromptContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 2.25rem;
+  text-align: center;
+  gap: 1.5rem;
+  min-height: 400px;
+`;
+
+export const LoginPromptIcon = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
+export const LoginPromptText = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  width: 100%;
+  max-width: 321px;
+`;
+
+export const LoginPromptTitle = styled.div`
+  color: #000;
+  font-size: 1.05rem;
+  font-weight: 600;
+  line-height: 1.4;
+`;
+
+export const LoginPromptDesc = styled.div`
+  color: #000;
+  font-size: 0.8rem;
+  font-weight: 400;
+  line-height: 1.5;
+`;
+
+export const LoginPromptButton = styled.button`
+  color: #fff;
+  background-color: #0093dd;
+  font-size: 1.125rem;
+  font-weight: 600;
+  border-radius: 0.625rem;
+  border: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  max-width: 321px;
+  height: 3rem;
+  cursor: pointer;
+  margin-top: 0.5rem;
+`;
