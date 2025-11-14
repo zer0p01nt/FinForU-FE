@@ -126,7 +126,7 @@ const savePreferences = async ({
   guestToken = null,
 }) => {
   const url = "/api/preference";
-  
+
   if (!Array.isArray(types) || types.length === 0) {
     throw new Error("types must be a non-empty array");
   }
@@ -598,22 +598,27 @@ const normalizeProducts = (data) => {
 
 const normalizeComparisonListResponse = (data) => {
   if (!data || typeof data !== "object") return [];
-  
+
   const responseData = data.data || data;
-  
+
   if (Array.isArray(responseData)) {
     return responseData.map((item) => {
       if (item.type === "CARD" || item.type === "card") {
         return buildCardProduct(item);
       } else if (item.type === "DEPOSIT" || item.type === "deposit") {
         return buildDepositProduct(item);
-      } else if (item.type === "SAVING" || item.type === "saving" || item.type === "SAVINGS" || item.type === "savings") {
+      } else if (
+        item.type === "SAVING" ||
+        item.type === "saving" ||
+        item.type === "SAVINGS" ||
+        item.type === "savings"
+      ) {
         return buildSavingProduct(item);
       }
       return buildDepositProduct(item);
     });
   }
-  
+
   return normalizeProducts(responseData);
 };
 
@@ -848,8 +853,8 @@ const mapPreferencesResponse = (data) => {
 };
 
 const UI_TO_API_TYPE_MAP = {
-  "Card": "CARD",
-  "Deposit": "DEPOSIT",
+  Card: "CARD",
+  Deposit: "DEPOSIT",
   "Installment Savings": "SAVING",
 };
 
@@ -860,28 +865,28 @@ const UI_TO_API_PERIOD_MAP = {
 };
 
 const UI_TO_API_SAVING_PURPOSE_MAP = {
-  "Education": "EDUCATION",
+  Education: "EDUCATION",
   "Emergency Fund": "EMERGENCY_FUND",
   "Home Purchase": "HOME_PURCHASE",
   "Monthly Expenses": "MONTHLY_EXPENSES",
-  "Retirement": "RETIREMENT",
-  "Travel": "TRAVEL",
-  "Others": "OTHERS",
+  Retirement: "RETIREMENT",
+  Travel: "TRAVEL",
+  Others: "OTHERS",
 };
 
 const UI_TO_API_CARD_PURPOSE_MAP = {
   "Credit Building": "CREDIT_BUILDING",
   "Daily Spending": "DAILY_SPENDING",
-  "Education": "EDUCATION",
+  Education: "EDUCATION",
   "Rewards Maximization": "REWARDS_MAXIMIZATION",
-  "Travel": "TRAVEL",
-  "Others": "OTHERS",
+  Travel: "TRAVEL",
+  Others: "OTHERS",
 };
 
 const UI_TO_API_INCOME_MAP = {
-  "Low": "LOW",
-  "Medium": "MEDIUM",
-  "High": "HIGH",
+  Low: "LOW",
+  Medium: "MEDIUM",
+  High: "HIGH",
 };
 
 const UI_TO_API_BANK_MAP = {
@@ -905,21 +910,25 @@ const mapPreferencesToApi = (preferences) => {
     .map((period) => UI_TO_API_PERIOD_MAP[period])
     .filter(Boolean);
 
-  const savingPurpose = preferences.savingsPurpose && preferences.savingsPurpose.trim()
-    ? UI_TO_API_SAVING_PURPOSE_MAP[preferences.savingsPurpose]
-    : null;
+  const savingPurpose =
+    preferences.savingsPurpose && preferences.savingsPurpose.trim()
+      ? UI_TO_API_SAVING_PURPOSE_MAP[preferences.savingsPurpose]
+      : null;
 
-  const cardPurpose = preferences.cardPurpose && preferences.cardPurpose.trim()
-    ? UI_TO_API_CARD_PURPOSE_MAP[preferences.cardPurpose]
-    : null;
+  const cardPurpose =
+    preferences.cardPurpose && preferences.cardPurpose.trim()
+      ? UI_TO_API_CARD_PURPOSE_MAP[preferences.cardPurpose]
+      : null;
 
-  const income = preferences.incomeLevel && preferences.incomeLevel.trim()
-    ? UI_TO_API_INCOME_MAP[preferences.incomeLevel]
-    : null;
+  const income =
+    preferences.incomeLevel && preferences.incomeLevel.trim()
+      ? UI_TO_API_INCOME_MAP[preferences.incomeLevel]
+      : null;
 
-  const bank = preferences.preferredBank && preferences.preferredBank.trim()
-    ? UI_TO_API_BANK_MAP[preferences.preferredBank]
-    : null;
+  const bank =
+    preferences.preferredBank && preferences.preferredBank.trim()
+      ? UI_TO_API_BANK_MAP[preferences.preferredBank]
+      : null;
 
   return {
     types,
@@ -998,7 +1007,7 @@ export default function Product() {
     let sourceId = detailProduct.sourceId ?? detailProduct.raw?.id;
 
     // sourceId가 없으면 id에서 숫자 부분 추출 (예: "card-123" -> "123")
-    
+
     if (!sourceId && detailProduct.id) {
       const match = detailProduct.id.match(/\d+$/);
       if (match) {
@@ -1064,20 +1073,20 @@ export default function Product() {
   const loadPreferences = useCallback(async () => {
     try {
       const loggedIn = await checkLoginStatus();
-      
+
       try {
         const guestToken = loggedIn ? null : getOrCreateGuestToken();
         const response = await getPreferences(guestToken);
-        
+
         if (response?.isSuccess && response?.data) {
-          const hasData = 
+          const hasData =
             (response.data.types && response.data.types.length > 0) ||
             (response.data.periods && response.data.periods.length > 0) ||
             response.data.savingPurpose ||
             response.data.cardPurpose ||
             response.data.income ||
             response.data.bank;
-          
+
           if (hasData) {
             const mappedPreferences = mapPreferencesResponse(response.data);
             setAiPreferences(mappedPreferences);
@@ -1199,11 +1208,15 @@ export default function Product() {
 
       try {
         const bank = compareFilters.bank ? mapBankIdToApiBank(compareFilters.bank) : null;
-        const type = compareFilters.productType ? API_PRODUCT_TYPE_MAP[compareFilters.productType] : null;
+        const type = compareFilters.productType
+          ? API_PRODUCT_TYPE_MAP[compareFilters.productType]
+          : null;
         const { minRate, maxRate } = compareFilters.interest
           ? mapInterestFilterToRateRange(compareFilters.interest)
           : { minRate: null, maxRate: null };
-        const termMonths = compareFilters.period ? mapPeriodFilterToTermMonths(compareFilters.period) : null;
+        const termMonths = compareFilters.period
+          ? mapPeriodFilterToTermMonths(compareFilters.period)
+          : null;
 
         const guestToken = getOrCreateGuestToken();
 
@@ -1285,111 +1298,114 @@ export default function Product() {
   const loadRecommendations = useCallback(async () => {
     if (!isLoggedIn || isCheckingLogin || !productsLoaded) return;
 
-      setIsRecommendationsLoading(true);
-      setRecommendationsError(null);
+    setIsRecommendationsLoading(true);
+    setRecommendationsError(null);
 
-      try {
-        const response = await getRecommendations();
+    try {
+      const response = await getRecommendations();
 
-        if (!response?.isSuccess || !response?.data) {
-          setRecommendedProducts([]);
-          setIsRecommendationsLoading(false);
-          return;
-        }
-
-        const results = response.data.results;
-        
-        if (!results || !Array.isArray(results)) {
-          setRecommendedProducts([]);
-          setIsRecommendationsLoading(false);
-          return;
-        }
-        
-        if (results.length === 0) {
-          setRecommendedProducts([]);
-          setIsRecommendationsLoading(false);
-          return;
-        }
-        
-        const matchedProducts = results
-          .map((recommendedItem, index) => {
-            const productType = recommendedItem.type?.toLowerCase() || "";
-            const normalizedType = productType === "saving" ? "saving" : productType;
-            
-            const matched = allProducts.find((product) => {
-              const sourceId = product.sourceId ?? product.raw?.id;
-              const productId = recommendedItem.id;
-              
-              const productTypeMatch = product.type === normalizedType || 
-                (normalizedType === "saving" && product.type === "savings");
-              
-              const idMatch = sourceId == productId || String(sourceId) === String(productId);
-              
-              if (productTypeMatch && idMatch) {
-                return true;
-              }
-              
-              if (idMatch) {
-                return true;
-              }
-              
-              return false;
-            });
-
-            if (matched) {
-              return {
-                id: `recommended-${index}-${matched.id}`,
-                productId: matched.id,
-                bankName: matched.bankName,
-                name: matched.name,
-                description: matched.highlight || matched.keyFeatures || "Learn more about this product.",
-                action: "Learn More",
-                bankLogo: getBankLogo(matched.bankName),
-              };
-            } else {
-              const typeLabel = recommendedItem.type === "CARD" ? "Card" 
-                : recommendedItem.type === "DEPOSIT" ? "Deposit" 
-                : "Savings";
-              
-              let description = "";
-              if (recommendedItem.type === "CARD") {
-                description = recommendedItem.feeAndBenefit || "Card product";
-              } else if (recommendedItem.type === "DEPOSIT" || recommendedItem.type === "SAVING") {
-                const rate = recommendedItem.maxInterestRate 
-                  ? `Up to ${recommendedItem.maxInterestRate}%` 
-                  : "";
-                const term = recommendedItem.termMonths 
-                  ? `${recommendedItem.termMonths} months` 
-                  : "";
-                description = [rate, term].filter(Boolean).join(" · ") || `${typeLabel} product`;
-              }
-
-              return {
-                id: `recommended-${index}-${recommendedItem.type}-${recommendedItem.id}`,
-                productId: null,
-                bankName: recommendedItem.bankName || "Unknown Bank",
-                name: recommendedItem.name || "Unknown Product",
-                description: description || "Learn more about this product.",
-                action: "Learn More",
-                bankLogo: getBankLogo(recommendedItem.bankName),
-                raw: recommendedItem,
-              };
-            }
-          })
-          .filter(Boolean);
-
-        setRecommendedProducts(matchedProducts);
-      } catch (error) {
-        if (error.response?.status === 404) {
-          setRecommendedProducts([]);
-          setRecommendationsError(null);
-        } else {
-          setRecommendationsError(error);
-          setRecommendedProducts([]);
-        }
-      } finally {
+      if (!response?.isSuccess || !response?.data) {
+        setRecommendedProducts([]);
         setIsRecommendationsLoading(false);
+        return;
       }
+
+      const results = response.data.results;
+
+      if (!results || !Array.isArray(results)) {
+        setRecommendedProducts([]);
+        setIsRecommendationsLoading(false);
+        return;
+      }
+
+      if (results.length === 0) {
+        setRecommendedProducts([]);
+        setIsRecommendationsLoading(false);
+        return;
+      }
+
+      const matchedProducts = results
+        .map((recommendedItem, index) => {
+          const productType = recommendedItem.type?.toLowerCase() || "";
+          const normalizedType = productType === "saving" ? "saving" : productType;
+
+          const matched = allProducts.find((product) => {
+            const sourceId = product.sourceId ?? product.raw?.id;
+            const productId = recommendedItem.id;
+
+            const productTypeMatch =
+              product.type === normalizedType ||
+              (normalizedType === "saving" && product.type === "savings");
+
+            const idMatch = sourceId == productId || String(sourceId) === String(productId);
+
+            if (productTypeMatch && idMatch) {
+              return true;
+            }
+
+            if (idMatch) {
+              return true;
+            }
+
+            return false;
+          });
+
+          if (matched) {
+            return {
+              id: `recommended-${index}-${matched.id}`,
+              productId: matched.id,
+              bankName: matched.bankName,
+              name: matched.name,
+              description:
+                matched.highlight || matched.keyFeatures || "Learn more about this product.",
+              action: "Learn More",
+              bankLogo: getBankLogo(matched.bankName),
+            };
+          } else {
+            const typeLabel =
+              recommendedItem.type === "CARD"
+                ? "Card"
+                : recommendedItem.type === "DEPOSIT"
+                  ? "Deposit"
+                  : "Savings";
+
+            let description = "";
+            if (recommendedItem.type === "CARD") {
+              description = recommendedItem.feeAndBenefit || "Card product";
+            } else if (recommendedItem.type === "DEPOSIT" || recommendedItem.type === "SAVING") {
+              const rate = recommendedItem.maxInterestRate
+                ? `Up to ${recommendedItem.maxInterestRate}%`
+                : "";
+              const term = recommendedItem.termMonths ? `${recommendedItem.termMonths} months` : "";
+              description = [rate, term].filter(Boolean).join(" · ") || `${typeLabel} product`;
+            }
+
+            return {
+              id: `recommended-${index}-${recommendedItem.type}-${recommendedItem.id}`,
+              productId: null,
+              bankName: recommendedItem.bankName || "Unknown Bank",
+              name: recommendedItem.name || "Unknown Product",
+              description: description || "Learn more about this product.",
+              action: "Learn More",
+              bankLogo: getBankLogo(recommendedItem.bankName),
+              raw: recommendedItem,
+            };
+          }
+        })
+        .filter(Boolean);
+
+      setRecommendedProducts(matchedProducts);
+    } catch (error) {
+      if (error.response?.status === 404) {
+        setRecommendedProducts([]);
+        setRecommendationsError(null);
+      } else {
+        setRecommendationsError(error);
+        setRecommendedProducts([]);
+      }
+    } finally {
+      setIsRecommendationsLoading(false);
+    }
   }, [isLoggedIn, isCheckingLogin, productsLoaded, allProducts]);
 
   useEffect(() => {
@@ -1600,11 +1616,15 @@ export default function Product() {
 
       if (isCompareRoute) {
         const bank = compareFilters.bank ? mapBankIdToApiBank(compareFilters.bank) : null;
-        const type = compareFilters.productType ? API_PRODUCT_TYPE_MAP[compareFilters.productType] : null;
+        const type = compareFilters.productType
+          ? API_PRODUCT_TYPE_MAP[compareFilters.productType]
+          : null;
         const { minRate, maxRate } = compareFilters.interest
           ? mapInterestFilterToRateRange(compareFilters.interest)
           : { minRate: null, maxRate: null };
-        const termMonths = compareFilters.period ? mapPeriodFilterToTermMonths(compareFilters.period) : null;
+        const termMonths = compareFilters.period
+          ? mapPeriodFilterToTermMonths(compareFilters.period)
+          : null;
 
         const guestToken = getOrCreateGuestToken();
 
@@ -1630,7 +1650,7 @@ export default function Product() {
       if (error.response) {
         const status = error.response.status;
         const message = error.response?.data?.message || "Failed to add product.";
-        
+
         if (status === 401) {
           setFloatingNotice("Please log in to add products.");
         } else if (status === 400) {
@@ -1700,7 +1720,7 @@ export default function Product() {
         setAiPreferences(merged);
         setPreferenceSheetOpen(false);
         setFloatingNotice("Preferences saved successfully.");
-        
+
         if (selectedTab === "ai") {
           loadRecommendations();
         }
@@ -1712,14 +1732,17 @@ export default function Product() {
         setFloatingNotice("Network error. Please check your connection or try again later.");
         return;
       }
-      
+
       if (error.response?.status === 500) {
         const serverMessage = error.response?.data?.message || "서버 내부 오류가 발생했습니다.";
         setFloatingNotice("Server error. Please try again later or contact support.");
       } else if (error.response?.status === 502) {
         setFloatingNotice("Server is temporarily unavailable. Please try again later.");
       } else if (error.response) {
-        const errorMessage = error.response?.data?.message || error.response?.data?.code || "Failed to save preferences.";
+        const errorMessage =
+          error.response?.data?.message ||
+          error.response?.data?.code ||
+          "Failed to save preferences.";
         setFloatingNotice(errorMessage);
       } else {
         setFloatingNotice("An unexpected error occurred. Please try again.");
@@ -1740,14 +1763,14 @@ export default function Product() {
 
   const handleVisitWebsite = (url) => {
     if (isOpeningWebsite) return;
-    
+
     if (!url || typeof url !== "string" || !url.trim()) {
       setFloatingNotice("Website URL is not available.");
       return;
     }
 
     let normalizedUrl = url.trim();
-    
+
     if (normalizedUrl === "" || normalizedUrl === "null" || normalizedUrl === "undefined") {
       setFloatingNotice("Website URL is not available.");
       return;
@@ -1761,7 +1784,7 @@ export default function Product() {
 
     try {
       const newWindow = window.open(normalizedUrl, "_blank", "noopener,noreferrer");
-      
+
       if (!newWindow) {
         setFloatingNotice("Please allow pop-ups to open the website in a new window.");
       }

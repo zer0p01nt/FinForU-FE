@@ -29,7 +29,6 @@ export default function Wallet() {
 
       if (res.data.data) {
         setWalletData(res.data.data);
-        console.log(res.data.data);
       } else {
         setWalletData(initialWalletData); // 데이터 초기화
       }
@@ -335,9 +334,6 @@ export default function Wallet() {
                 </svg>
                 <S.SavingsNCardBox>
                   <S.AccountName>{account.name}</S.AccountName>
-                  <S.AccountDesc>
-                    {t(`${account.savingType}`)} - {t(`banks.${account.bankName}`)}
-                  </S.AccountDesc>
                 </S.SavingsNCardBox>
                 <S.BtnWrapper>
                   {/* 수정 버튼 */}
@@ -481,9 +477,6 @@ export default function Wallet() {
                 </S.CardCircle>
                 <S.SavingsNCardBox>
                   <S.AccountName>{card.name}</S.AccountName>
-                  <S.AccountDesc>
-                    {t(`${card.cardType} card`)} - {t(`banks.${card.bankName}`)}
-                  </S.AccountDesc>
                 </S.SavingsNCardBox>
                 <S.BtnWrapper>
                   {/* 수정 버튼 */}

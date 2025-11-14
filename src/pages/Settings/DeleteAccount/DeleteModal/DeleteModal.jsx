@@ -31,31 +31,11 @@ export default function DeleteModal({ onClose }) {
   // 삭제 API 요청 핸들러
   const handleDeleteAccount = async () => {
     if (isLoading) return; // 중복 요청 방지
-
     setIsLoading(true);
-    let currentPassword = null;
 
-    // 현재 계정 비밀번호 가져오는 작업
+    // 계정 삭제하는 작업
     try {
-      const passwordRes = await api.get("/api/members/me");
-      currentPassword = passwordRes.data.password;
-      if (!currentPassword) {
-        throw new Error("Failed to get password.");
-      }
-    } catch (error) {
-      if (!mountedRef.current) return;
-      console.error("비밀번호 가져오기 실패", error);
-      setIsLoading(false);
-      return;
-    }
-
-    // 비밀번호 활용해 계정 삭제하는 작업
-    try {
-      const response = await api.delete("/api/members/me", {
-        data: {
-          password: currentPassword,
-        },
-      });
+      const response = await api.delete("/api/members/me");
       if (!mountedRef.current) return;
       if (response.status === 204) {
         setIsComplete(true);
@@ -66,7 +46,9 @@ export default function DeleteModal({ onClose }) {
       }
       if (!mountedRef.current) return;
       setIsLoading(false);
-    } catch {
+    } catch (error) {
+      if (!mountedRef.current) return;
+      console.error(error);
       alert("Failed to delete account.");
       setIsLoading(false);
     } finally {

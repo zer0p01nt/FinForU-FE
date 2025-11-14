@@ -100,12 +100,14 @@ export default function Login() {
                 onChange={(e) => setEmail(e.target.value)}
                 value={email}
                 type="email"
+                autoComplete="username"
               />
               <S.PWInput
                 placeholder={t("login.password")}
                 onChange={(e) => setPassword(e.target.value)}
                 value={password}
                 type="password"
+                autoComplete="current-password"
               />
             </div>
             <S.Btn $isLogin={true} type="submit">

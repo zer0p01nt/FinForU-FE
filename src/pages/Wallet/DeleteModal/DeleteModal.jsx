@@ -47,7 +47,7 @@ export default function DeleteModal({ type, id, onClose }) {
 
       if (res.status === 200 || res.status === 204) {
         // 204 No Content도 성공으로 처리
-        alert(t("success.deleteProduct") || "상품이 성공적으로 삭제되었습니다.");
+        alert("Deleted successfully.");
         onClose(); // 성공 시 모달 닫기 -> Wallet에서 데이터 재조회 처리
       } else {
         throw new Error("API response error");

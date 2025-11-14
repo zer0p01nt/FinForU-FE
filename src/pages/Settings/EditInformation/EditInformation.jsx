@@ -252,7 +252,6 @@ export default function EditInformation() {
 
         // 실제 API 호출: PATCH 또는 PUT
         const res = await api.patch("/api/members/me", newData);
-        console.log(res);
         const memberId = formData.memberId || formData.id || formData.member_id;
 
         // true -> false
