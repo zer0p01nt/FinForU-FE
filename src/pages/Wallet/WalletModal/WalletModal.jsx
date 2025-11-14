@@ -23,17 +23,20 @@ export default function WalletModal({ type, modalType, id = null, onClose }) {
     bank: "",
     productType: "",
     productName: "",
-    startDate: "",
-    endDate: "",
-    monthlyPay: "",
-    paymentDate: "",
+    // card일 때
+    cardType: "",
+    cardName: "",
+    start: "",
+    end: "",
+    monthlyPayment: "",
+    upcomingDate: "",
   };
 
   // 초기 상태값
   const [formData, setFormData] = useState(initialFormData);
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isLoading, setIsLoading] = useState(modalType.value === "edit");
+  const [isLoading, setIsLoading] = useState(false);
 
   // 은행 드롭다운 값
   const bankName = { value: "bank", label: t("product.bank") };
@@ -75,7 +78,7 @@ export default function WalletModal({ type, modalType, id = null, onClose }) {
     let cleanValue = value;
 
     // MM/YYYY로 보이지만 MMYYYY를 저장
-    if (field === "startDate" || field === "endDate") {
+    if (field === "start" || field === "end") {
       cleanValue = String(value)
         .replace(/[^0-9]/g, "")
         .substring(0, 6);
@@ -91,13 +94,15 @@ export default function WalletModal({ type, modalType, id = null, onClose }) {
     }));
   }, []);
 
-  // productType 버튼 클릭 핸들러
+  // productType/cardType 버튼 클릭 핸들러
   const handleTypeClick = useCallback(
     (typeValue) => {
-      handleChange("productType", typeValue);
+      const field = type.value === "card" ? "cardType" : "productType";
+      handleChange(field, typeValue);
+
       // CHECK 카드를 선택하면 납부일자 필드 초기화/비활성화
       if (type.value === "card" && typeValue === "CHECK") {
-        handleChange("paymentDate", "");
+        handleChange("upcomingDate", "");
       }
     },
     [handleChange, type.value]
@@ -113,47 +118,51 @@ export default function WalletModal({ type, modalType, id = null, onClose }) {
       newErrors.bank = "Please select a bank.";
     }
 
-    // savings이거나 card일 때 === type, name
-    if (type.value === "savings" || type.value === "card") {
+    // savings일 때
+    if (type.value === "savings") {
       if (!data.productType) {
         newErrors.productType = "Please select the product type.";
       }
       if (!data.productName) {
         newErrors.productName = "Please enter the product name.";
       }
-    }
 
-    // savings일 때 === date, monthly, paymentDate
-    if (type.value === "savings") {
       const dateRegex = /^(0[1-9]|1[0-2])\d{4}$/; // MMYYYY 형식
 
-      if (!data.startDate || !dateRegex.test(data.startDate))
-        newErrors.startDate = "Please enter the exact start date.";
-      if (!data.endDate || !dateRegex.test(data.endDate))
-        newErrors.endDate = "Please enter the exact end date.";
+      if (!data.start || !dateRegex.test(data.start))
+        newErrors.start = "Please enter the exact start date.";
+      if (!data.end || !dateRegex.test(data.end))
+        newErrors.end = "Please enter the exact end date.";
 
-      const payAmount = Number(data.monthlyPay);
-      if (!data.monthlyPay || isNaN(payAmount))
-        newErrors.monthlyPay = "Please enter the exact monthly payment.";
+      const payAmount = Number(data.monthlyPayment);
+      if (!data.monthlyPayment || isNaN(payAmount))
+        newErrors.monthlyPayment = "Please enter the exact monthly payment.";
 
       // Optional이지만 입력 시 형식 검사
-      const paymentDay = Number(data.paymentDate);
-      if (data.paymentDate && (isNaN(paymentDay) || paymentDay < 1 || paymentDay > 31)) {
-        newErrors.paymentDate = "Please enter the exact payment date.";
+      const paymentDay = Number(data.upcomingDate);
+      if (data.upcomingDate && (isNaN(paymentDay) || paymentDay < 1 || paymentDay > 31)) {
+        newErrors.upcomingDate = "Please enter the exact payment date.";
       }
     }
 
-    // card일 때 === paymentDate
+    // card일 때 === upcomingDate
     else if (type.value === "card") {
-      const paymentDay = Number(data.paymentDate);
+      if (!data.cardType) {
+        newErrors.cardType = "Please select the card type.";
+      }
+      if (!data.cardName) {
+        newErrors.cardName = "Please enter the card name.";
+      }
+
+      const paymentDay = Number(data.upcomingDate);
 
       // Credit 카드일 경우 납부일자 필수
-      if (data.productType === "CREDIT" && !data.paymentDate) {
-        newErrors.paymentDate = "Please enter the exact payment date.";
+      if (data.cardType === "CREDIT" && !data.upcomingDate) {
+        newErrors.upcomingDate = "Please enter the exact payment date.";
       }
       // 입력했을 경우 형식 검사
-      else if (data.paymentDate && (isNaN(paymentDay) || paymentDay < 1 || paymentDay > 31)) {
-        newErrors.paymentDate = "Please enter the exact payment date.";
+      else if (data.upcomingDate && (isNaN(paymentDay) || paymentDay < 1 || paymentDay > 31)) {
+        newErrors.upcomingDate = "Please enter the exact payment date.";
       }
     }
 
@@ -168,18 +177,6 @@ export default function WalletModal({ type, modalType, id = null, onClose }) {
     const month = mmYYYY.substring(0, 2);
     const year = mmYYYY.substring(2, 6);
     return `${year}-${month}-01`;
-  }, []);
-
-  // YYYY-MM-01 -> MMYYYY 변환 (LocalDate에서 변환)
-  const transformDateFromApi = useCallback((yyyyMMDD) => {
-    if (yyyyMMDD || yyyyMMDD.length < 7) return ""; // 최소 7자
-
-    const parts = yyyyMMDD.split("-");
-    if (parts.length < 2) return "";
-
-    const year = parts[0];
-    const month = parts[1].padStart(2, "0"); // MM 포맷 보장
-    return `${month}${year}`; // MMYYYY
   }, []);
 
   // API 요청 로직
@@ -199,38 +196,48 @@ export default function WalletModal({ type, modalType, id = null, onClose }) {
     return { url, method };
   };
 
-  // edit일 때 기존 데이터 로딩
-  useEffect(() => {
-    const fetchInitData = async () => {
-      if (modalType.value === "edit") {
-        const { url } = getApiInfo(type.value, "edit", id);
+  // API 요청 시 데이터 매핑 및 불필요 필드 제거 유틸리티 함수
+  const prepareDataForApi = useCallback(
+    (data, currentType) => {
+      const dataToSend = { ...data };
 
-        try {
-          const res = await api.get(url);
-          if (res.data) {
-            const loadedData = res.data;
-            setFormData({
-              bank: loadedData.bank || "",
-              productType: loadedData.productType || "",
-              productName: loadedData.productName || "",
-              startDate: transformDateFromApi(loadedData.startDate),
-              endDate: transformDateFromApi(loadedData.endDate),
-              monthlyPay: loadedData.monthlyPay || "",
-              paymentDate: loadedData.paymentDate || "",
-            });
-          }
-        } catch (error) {
-          alert("Failed to load product details for editing.");
-          onClose();
-        } finally {
-          setIsLoading(false);
-        }
-      } else {
-        setIsLoading(false);
+      // 날짜 포맷 변경
+      if (currentType === "savings") {
+        dataToSend.start = transformDateToApi(data.start);
+        dataToSend.end = transformDateToApi(data.end);
       }
-    };
-    fetchInitData();
-  }, [modalType.value, id, type.value, getApiInfo, onClose, transformDateFromApi]);
+
+      // 필드 이름 매핑 및 정리
+      if (currentType === "card") {
+        // cardType/cardName을 productType/productName으로 매핑
+        dataToSend.productType = dataToSend.cardType;
+        dataToSend.productName = dataToSend.cardName;
+
+        // 불필요한 필드 제거
+        delete dataToSend.cardType;
+        delete dataToSend.cardName;
+        delete dataToSend.start;
+        delete dataToSend.end;
+        delete dataToSend.monthlyPayment;
+      } else if (currentType === "savings") {
+        // 불필요한 card 필드 제거
+        delete dataToSend.cardType;
+        delete dataToSend.cardName;
+      } else if (currentType === "checking") {
+        // checking일 경우 모든 product, card, date 필드 제거
+        delete dataToSend.productType;
+        delete dataToSend.productName;
+        delete dataToSend.cardType;
+        delete dataToSend.cardName;
+        delete dataToSend.start;
+        delete dataToSend.end;
+        delete dataToSend.monthlyPayment;
+      }
+
+      return dataToSend;
+    },
+    [transformDateToApi]
+  );
 
   // Add Another Account 버튼 & Confirm 버튼 공통 추가 로직
   const handleSave = useCallback(
@@ -245,22 +252,16 @@ export default function WalletModal({ type, modalType, id = null, onClose }) {
       setIsSubmitting(true);
       const { url, method } = getApiInfo(type.value, "add", null);
 
-      // 서버에 LocalDate 형태로 보냄
-      const dataToSend = { ...formData };
-      if (type.value === "savings") {
-        dataToSend.startDate = transformDateToApi(formData.startDate);
-        dataToSend.endDate = transformDateToApi(formData.endDate);
-      }
+      const dataToSend = prepareDataForApi(formData, type.value);
 
       try {
         const res = await api[method](url, dataToSend);
 
-        if (res.status === 200 || response.status === 201) {
+        if (res.status === 200 || res.status === 201) {
           if (isAddAnother) {
-            // Add Another Account를 누른 경우
             setFormData(initialFormData); // 폼 리셋
+            setErrors({}); // 에러 리셋
           } else {
-            // Confirm을 누른 경우 (마지막 계좌 저장)
             onClose(); // 모달 닫기
           }
         } else {
@@ -282,7 +283,7 @@ export default function WalletModal({ type, modalType, id = null, onClose }) {
       onClose,
       getApiInfo,
       initialFormData,
-      transformDateToApi,
+      prepareDataForApi,
     ]
   );
 
@@ -290,40 +291,30 @@ export default function WalletModal({ type, modalType, id = null, onClose }) {
   const handleConfirm = useCallback(async () => {
     if (isSubmitting || isLoading) return;
 
-    if (modalType.value === "add") {
-      // Add일 때는 handleSave (POST)
-      await handleSave(false);
-    } else {
-      // Edit일 때는 PUT
-      if (!validateForm()) {
-        alert("Please enter all values correctly.");
-        return;
+    if (!validateForm()) {
+      alert("Please enter all values correctly.");
+      return;
+    }
+
+    setIsSubmitting(true);
+    const { url, method } = getApiInfo(type.value, modalType.value, id);
+
+    const dataToSend = prepareDataForApi(formData, type.value);
+
+    try {
+      const res = await api[method](url, dataToSend);
+
+      if (res.status === 200 || res.status === 201) {
+        onClose();
+      } else {
+        console.error("API response error");
+        throw new Error("API response error");
       }
-
-      setIsSubmitting(true);
-      const { url, method } = getApiInfo(type.value, "edit", id);
-
-      // 서버에 LocalDate 형태로 보냄
-      const dataToSend = { ...formData };
-      if (type.value === "savings") {
-        dataToSend.startDate = transformDateToApi(formData.startDate);
-        dataToSend.endDate = transformDateToApi(formData.endDate);
-      }
-
-      try {
-        const res = await api[method](url, dataToSend);
-
-        if (res.status === 200) {
-          onClose(); // 모달 닫기
-        } else {
-          throw new Error("API response error");
-        }
-      } catch (error) {
-        console.error(error);
-        alert("An error occurred while adding the product.");
-      } finally {
-        setIsSubmitting(false);
-      }
+    } catch (error) {
+      console.error(error);
+      alert("An error occurred while processing the product.");
+    } finally {
+      setIsSubmitting(false);
     }
   }, [
     modalType,
@@ -335,7 +326,7 @@ export default function WalletModal({ type, modalType, id = null, onClose }) {
     getApiInfo,
     isSubmitting,
     isLoading,
-    transformDateToApi,
+    prepareDataForApi,
   ]);
 
   // 모달 밖 클릭 시 닫기
@@ -349,7 +340,7 @@ export default function WalletModal({ type, modalType, id = null, onClose }) {
   );
 
   // card && CHECK일 때 비활성화
-  const isPaymentDateDisabled = type.value === "card" && formData.productType === "CHECK";
+  const isUpcomingDateDisabled = type.value === "card" && formData.cardType === "CHECK";
 
   return (
     <S.Overlay onClick={handleOverlayClick}>
@@ -392,7 +383,7 @@ export default function WalletModal({ type, modalType, id = null, onClose }) {
                         <S.TypeBtn
                           key={t.value}
                           onClick={() => handleTypeClick(t.value)}
-                          $selected={formData.productType === t.value}
+                          $selected={formData.cardType === t.value}
                           disabled={isSubmitting}
                         >
                           {t.label}
@@ -400,6 +391,7 @@ export default function WalletModal({ type, modalType, id = null, onClose }) {
                       ))}
                   </S.ButtonWrapper>
                   {errors.productType && <J.ValidText>{errors.productType}</J.ValidText>}
+                  {errors.cardType && <J.ValidText>{errors.cardType}</J.ValidText>}
                 </S.WalletLabel>
                 <S.WalletLabel>
                   {t("wallet.productName")}
@@ -407,11 +399,21 @@ export default function WalletModal({ type, modalType, id = null, onClose }) {
                     name="name"
                     id="name"
                     placeholder={t("wallet.enterName")}
-                    value={formData.productName}
-                    onChange={(e) => handleChange("productName", e.target.value)}
+                    value={type.value === "card" ? formData.cardName : formData.productName}
+                    onChange={(e) =>
+                      handleChange(
+                        type.value === "card" ? "cardName" : "productName",
+                        e.target.value
+                      )
+                    }
                     disabled={isSubmitting}
                   />
-                  {errors.productName && <J.ValidText>{errors.productName}</J.ValidText>}
+                  {errors.productName && type.value === "savings" && (
+                    <J.ValidText>{errors.productName}</J.ValidText>
+                  )}
+                  {errors.cardName && type.value === "card" && (
+                    <J.ValidText>{errors.cardName}</J.ValidText>
+                  )}
                 </S.WalletLabel>
               </>
             )}
@@ -421,43 +423,43 @@ export default function WalletModal({ type, modalType, id = null, onClose }) {
                   {t("wallet.accountPeriod")}
                   <S.PeriodWrapper>
                     <S.PeriodInput
-                      name="startDate"
-                      id="startDate"
+                      name="start"
+                      id="start"
                       placeholder="MM/YYYY"
-                      value={formatDate(formData.startDate)}
-                      onChange={(e) => handleChange("startDate", e.target.value)}
+                      value={formatDate(formData.start)}
+                      onChange={(e) => handleChange("start", e.target.value)}
                       disabled={isSubmitting}
                       inputMode="numeric"
                     />
                     <S.PeriodBar />
                     <S.PeriodInput
-                      name="endDate"
-                      id="endDate"
+                      name="end"
+                      id="end"
                       placeholder="MM/YYYY"
-                      value={formatDate(formData.endDate)}
-                      onChange={(e) => handleChange("endDate", e.target.value)}
+                      value={formatDate(formData.end)}
+                      onChange={(e) => handleChange("end", e.target.value)}
                       disabled={isSubmitting}
                       inputMode="numeric"
                     />
                   </S.PeriodWrapper>
-                  {(errors.startDate || errors.endDate) && (
-                    <J.ValidText>{errors.startDate || errors.endDate}</J.ValidText>
+                  {(errors.start || errors.end) && (
+                    <J.ValidText>{errors.start || errors.end}</J.ValidText>
                   )}
                 </S.WalletLabel>
                 <S.WalletLabel>
                   {t("wallet.monthlyPayment")}
                   <S.InputWrapper>
                     <S.MonthlyInput
-                      name="monthlyPay"
-                      id="monthlyPay"
-                      value={formData.monthlyPay}
-                      onChange={(e) => handleChange("monthlyPay", e.target.value)}
+                      name="monthlyPayment"
+                      id="monthlyPayment"
+                      value={formData.monthlyPayment}
+                      onChange={(e) => handleChange("monthlyPayment", e.target.value)}
                       disabled={isSubmitting}
                       inputMode="numeric"
                     />
                     <S.MonthlyMark>&#8361;</S.MonthlyMark>
                   </S.InputWrapper>
-                  {errors.monthlyPay && <J.ValidText>{errors.monthlyPay}</J.ValidText>}
+                  {errors.monthlyPayment && <J.ValidText>{errors.monthlyPayment}</J.ValidText>}
                 </S.WalletLabel>
               </>
             )}
@@ -470,17 +472,17 @@ export default function WalletModal({ type, modalType, id = null, onClose }) {
                   <S.UpcomingDesc>{t("wallet.dateDesc")}</S.UpcomingDesc>
                   <S.InputWrapper>
                     <S.UpcomingInput
-                      name="paymentDate"
-                      id="paymentDate"
-                      value={formData.paymentDate}
-                      onChange={(e) => handleChange("paymentDate", e.target.value)}
-                      disabled={isPaymentDateDisabled || isSubmitting}
+                      name="upcomingDate"
+                      id="upcomingDate"
+                      value={formData.upcomingDate}
+                      onChange={(e) => handleChange("upcomingDate", e.target.value)}
+                      disabled={isUpcomingDateDisabled || isSubmitting}
                       inputMode="numeric"
                     />
                     <S.DDMark>DD</S.DDMark>
                     <S.DayMark>Day</S.DayMark>
                   </S.InputWrapper>
-                  {errors.paymentDate && <J.ValidText>{errors.paymentDate}</J.ValidText>}
+                  {errors.upcomingDate && <J.ValidText>{errors.upcomingDate}</J.ValidText>}
                 </S.UpcomingLabel>
               </>
             )}
