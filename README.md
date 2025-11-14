@@ -36,7 +36,9 @@
         <div>푸시 알림</div>
       </td>
       <td align="center">
-        <div>구현한 기능</div>
+        <div>금융 가이드 (chatbot)</div>
+        <div>특화 점포 안내 (지도 렌더링)</div>
+        <div>금융 상품 안내 (상품 비교, ai 추천)</div>
       </td>
     </tr>
   </tbody>
