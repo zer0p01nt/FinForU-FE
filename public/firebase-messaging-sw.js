@@ -1,3 +1,6 @@
+import { precacheAndRoute } from "workbox-precaching";
+precacheAndRoute(self.__WB_MANIFEST || []);
+
 // 자동으로 이 파일을 sw로 인식하도록 설정
 self.addEventListener("install", () => self.skipWaiting());
 self.addEventListener("activate", (evt) => evt.waitUntil(self.clients.claim()));

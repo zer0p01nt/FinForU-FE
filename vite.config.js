@@ -9,6 +9,9 @@ export default defineConfig({
     svgr(),
     react(),
     VitePWA({
+      strategies: "injectManifest",
+      srcDir: "public",
+      filename: "firebase-messaging-sw.js",
       registerType: "autoUpdate", // 새 버전 생기면 자동 업데이트
       includeAssets: [
         "favicons/favicon.ico",
@@ -35,6 +38,10 @@ export default defineConfig({
             type: "image/png",
           },
         ],
+      },
+      devOptions: {
+        enabled: true, // 개발 모드에서 PWA 활성화
+        type: "module",
       },
     }),
   ],
