@@ -12,6 +12,10 @@ export default defineConfig({
       strategies: "injectManifest",
       srcDir: "public",
       filename: "firebase-messaging-sw.js",
+      workbox: {
+        maximumFileSizeToCacheInBytes: 0,
+        globPatterns: [],
+      },
       registerType: "autoUpdate", // 새 버전 생기면 자동 업데이트
       includeAssets: [
         "favicons/favicon.ico",
