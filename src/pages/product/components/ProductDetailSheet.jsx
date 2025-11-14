@@ -168,11 +168,20 @@ export default function ProductDetailSheet({
     }
   }
 
-  const resolvedDetail = cardDetail || depositDetail || savingDetail || null;
+  // detailData 자체가 상세 정보를 담고 있는 경우도 처리
+  const resolvedDetail = cardDetail || depositDetail || savingDetail || detailData || null;
 
   const heroTitle = resolvedDetail?.name || product.name;
   const description =
     resolvedDetail?.description || product.keyFeatures || product.highlight || product.description || "";
+  
+  // URL: 상세 API에서 받은 website를 우선 사용, 없으면 product.website 사용
+  // 상세 API 응답에서 website 또는 officialUrl 확인
+  const officialUrl = 
+    resolvedDetail?.website || 
+    resolvedDetail?.officialUrl || 
+    product.website || 
+    "";
 
   let detailBlocks = [];
 
@@ -267,7 +276,7 @@ export default function ProductDetailSheet({
       </S.DetailSection>
 
       <S.DetailActions>
-        <S.PrimaryButton type="button" onClick={() => onVisitWebsite?.(product.website)} disabled={!product.website}>
+        <S.PrimaryButton type="button" onClick={() => onVisitWebsite?.(officialUrl)} disabled={!officialUrl}>
           <img src={WebIcon} alt="" width={20} height={20} />
           Official Website
         </S.PrimaryButton>

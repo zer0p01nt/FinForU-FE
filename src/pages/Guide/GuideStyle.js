@@ -27,7 +27,8 @@ export const WelcomeMessage = styled.div`
   font-size: 1rem;
   line-height: 1.5;
   margin-bottom: 1.5rem;
-  white-space: pre-line;
+  white-space: pre-wrap;
+  word-wrap: break-word;
 `;
 
 export const MessageList = styled.div`
@@ -99,7 +100,7 @@ export const FAQButton = styled.button`
   cursor: pointer;
   transition: background-color 0.2s;
   text-align: left;
-  max-width: 120px;
+  max-width: 220px;
   line-height: 1.4;
 
   &:disabled {

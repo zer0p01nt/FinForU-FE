@@ -962,6 +962,19 @@ export const CompareCardButton = styled(ProductCard).attrs({ as: "button" })`
         transform: none;
       }
     `}
+
+  /* CompareCardButton 내부의 CardMeta에 체크박스 공간 확보 */
+  ${CardMeta} {
+    padding-right: 4.5rem;
+    min-width: 0; /* flex item이 축소될 수 있도록 */
+  }
+
+  /* CompareCardButton 내부의 CardTitle에 줄바꿈 허용 */
+  ${CardTitle} {
+    word-wrap: break-word;
+    word-break: break-word;
+    line-height: 1.4;
+  }
 `;
 
 export const CompareSelectorCheck = styled.span`

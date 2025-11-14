@@ -36,11 +36,10 @@ const CARD_PURPOSE_OPTIONS = [
 const INCOME_LEVEL_OPTIONS = ["Low", "Medium", "High"];
 
 const PREFERRED_BANK_OPTIONS = [
-  "Sunny Bank",
-  "GreenTree Bank",
-  "DeepBlue Bank",
-  "SkyBank",
-  "Others",
+  "KB Bank",
+  "Woori Bank",
+  "Hana Bank",
+  "Shinhan Bank",
 ];
 
 export default function PreferenceEditorSheet({ isOpen, initialValues, onClose, onSave }) {
@@ -283,18 +282,21 @@ export default function PreferenceEditorSheet({ isOpen, initialValues, onClose, 
               {openDropdown === "bank" && (
                 <S.PreferenceSelectDropdown>
                   <S.FilterDropdownList style={{ maxHeight: "220px", overflowY: "auto" }}>
-                    {dropdownOptions.preferredBank.map((option) => (
-                      <S.DropdownOption
-                        key={option}
-                        $active={preferredBank === option}
-                        onClick={() => {
-                          setPreferredBank(option);
-                          setOpenDropdown(null);
-                        }}
-                      >
-                        <span>{option}</span>
-                      </S.DropdownOption>
-                    ))}
+                    {dropdownOptions.preferredBank.map((option) => {
+                      const active = preferredBank === option;
+                      return (
+                        <S.DropdownOption
+                          key={option}
+                          $active={active}
+                          onClick={() => {
+                            setPreferredBank(active ? "" : option);
+                            setOpenDropdown(null);
+                          }}
+                        >
+                          <span>{option}</span>
+                        </S.DropdownOption>
+                      );
+                    })}
                   </S.FilterDropdownList>
                 </S.PreferenceSelectDropdown>
               )}

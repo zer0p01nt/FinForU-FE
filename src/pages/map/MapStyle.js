@@ -200,6 +200,14 @@ export const CardInfoWithIcon = styled.div`
     width: 16px;
     height: 16px;
     flex-shrink: 0;
+    
+    ${({ $isTimeIcon }) =>
+      $isTimeIcon &&
+      `
+      path {
+        fill: #009cea;
+      }
+    `}
   }
 
   span {

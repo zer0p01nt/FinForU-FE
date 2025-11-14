@@ -95,7 +95,7 @@
   "guide": {
     "greeting": "您好，我是您的 AI 助理。\n今天有什么可以帮您的?",
     "placeholder": "问我任何问题...",
-    "loading": "AI正在生成回复"
+    "loading": "AI正在生成回复 · · ·"
   },
   "map": {
     "foreignExclusiveBranch": "外国人专用分行",

@@ -95,7 +95,7 @@
   "guide": {
     "greeting": "Xin chào, tôi là trợ lý AI của bạn.\nTôi có thể giúp gì cho bạn hôm nay?",
     "placeholder": "Hỏi tôi bất cứ điều gì...",
-    "loading": "AI đang tạo phản hồi"
+    "loading": "AI đang tạo phản hồi · · ·"
   },
   "map": {
     "foreignExclusiveBranch": "Chi nhánh dành riêng cho người nước ngoài",

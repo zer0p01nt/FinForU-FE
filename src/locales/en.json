@@ -95,7 +95,7 @@
   "guide": {
     "greeting": "Hello, I'm your AI assistant.\nHow can I help you today?",
     "placeholder": "Ask me anything...",
-    "loading": "AI is generating a response"
+    "loading": "AI is generating a response · · ·"
   },
   "map": {
     "foreignExclusiveBranch": "Foreign-exclusive branch",
