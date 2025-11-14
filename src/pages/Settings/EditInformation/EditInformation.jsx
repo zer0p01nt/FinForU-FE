@@ -251,53 +251,51 @@ export default function EditInformation() {
         delete newData.desiredProducts; // 기존 필드는 삭제하여 서버 혼동 방지
 
         // 실제 API 호출: PATCH 또는 PUT
-        await api.patch("/api/members/me", newData);
+        const res = await api.patch("/api/members/me", newData);
+        console.log(res);
         const memberId = formData.memberId || formData.id || formData.member_id;
 
-        // 알림 설정 변경 로직
-        if (memberId) {
-          // true -> false
-          if (initialNotifyStatus === true && isNotifyOn === false) {
-            console.log("Notification turned OFF. Deactivating FCM token...");
-            try {
+        // true -> false
+        if (initialNotifyStatus === true && isNotifyOn === false) {
+          console.log("Notification turned OFF. Deactivating FCM token...");
+          try {
+            const fcmToken = await requestForToken();
+            if (fcmToken) {
+              // JWT를 통해 서버에서 사용자 식별
+              const deactivateData = { token: fcmToken };
+              await api.post("/api/push/deactivate", deactivateData);
+              console.log(`FCM Token deactivated successfully.`);
+            }
+          } catch (error) {
+            console.error("Failed to deactivate FCM token:", error);
+          }
+        }
+
+        // false -> true
+        else if (initialNotifyStatus === false && isNotifyOn === true) {
+          console.log("Notification turned ON. Registering FCM token...");
+          try {
+            // 알림 권한 요청 (만약 이전에 거부했다면 다시 요청)
+            if (Notification.permission === "default") {
+              await Notification.requestPermission();
+            }
+
+            if (Notification.permission === "granted") {
               const fcmToken = await requestForToken();
               if (fcmToken) {
-                const deactivateData = { memberid: memberId, token: fcmToken };
-                await api.post("/api/push/deactivate", deactivateData);
-                console.log(`FCM Token deactivated successfully for member: ${memberId}`);
-              }
-            } catch (error) {
-              console.error("Failed to deactivate FCM token:", error);
-            }
-          }
-
-          // false -> true
-          else if (initialNotifyStatus === false && isNotifyOn === true) {
-            console.log("Notification turned ON. Registering FCM token...");
-            try {
-              // 알림 권한 요청 (만약 이전에 거부했다면 다시 요청)
-              if (Notification.permission === "default") {
-                await Notification.requestPermission();
-              }
-
-              if (Notification.permission === "granted") {
-                const fcmToken = await requestForToken();
-                if (fcmToken) {
-                  const registerData = { memberid: memberId, token: fcmToken };
-                  await api.post("/api/push/register", registerData);
-                  console.log(`FCM Token registered successfully for member: ${memberId}`);
-                } else {
-                  console.warn("FCM Token not available, cannot register push notifications.");
-                }
+                // JWT를 통해 서버에서 사용자 식별
+                const registerData = { token: fcmToken };
+                await api.post("/api/push/register", registerData);
+                console.log(`FCM Token registered successfully.`);
               } else {
-                console.warn("Cannot register token: Notification permission is denied by user.");
+                console.warn("FCM Token not available, cannot register push notifications.");
               }
-            } catch (error) {
-              console.error("Failed to register FCM token:", error);
+            } else {
+              console.warn("Cannot register token: Notification permission is denied by user.");
             }
+          } catch (error) {
+            console.error("Failed to register FCM token:", error);
           }
-        } else {
-          console.error("Member ID not found for token activation/deactivation.");
         }
 
         alert("Your changed information has been saved successfully.");

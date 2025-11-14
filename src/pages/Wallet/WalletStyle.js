@@ -111,6 +111,14 @@ export const CheckingAccount = styled.div`
   justify-self: flex-start;
 `;
 
+export const CheckName = styled.div`
+  font-size: 0.9375rem;
+  color: #000;
+  font-weight: 500;
+  width: 100%;
+  justify-self: flex-start;
+`;
+
 export const SavingsNCardBox = styled.div`
   display: flex;
   flex-direction: column;

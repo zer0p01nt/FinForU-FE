@@ -28,9 +28,8 @@ export default function Wallet() {
 
       if (res.data.data) {
         setWalletData(res.data.data);
+        console.log(res.data.data);
       } else {
-        alert("Failed to get wallet data.");
-        console.error(res.data.message);
         setWalletData(initialWalletData); // 데이터 초기화
       }
     } catch (error) {
@@ -201,7 +200,7 @@ export default function Wallet() {
                     fill="#0093DD"
                   />
                 </svg>
-                <S.Placeholder>{account.bank}</S.Placeholder>
+                <S.CheckName>{account.bankName}</S.CheckName>
                 <S.BtnWrapper>
                   {/* 수정 버튼 */}
                   <button onClick={() => openModal(productChecking, modalEdit, account.checkingId)}>
@@ -335,7 +334,7 @@ export default function Wallet() {
                 <S.SavingsNCardBox>
                   <S.AccountName>{account.name}</S.AccountName>
                   <S.AccountDesc>
-                    {t(`${account.savingType}`)} - {t(`banks.${account.bank}`)}
+                    {t(`${account.savingType}`)} - {t(`banks.${account.bankName}`)}
                   </S.AccountDesc>
                 </S.SavingsNCardBox>
                 <S.BtnWrapper>
@@ -481,7 +480,7 @@ export default function Wallet() {
                 <S.SavingsNCardBox>
                   <S.AccountName>{card.name}</S.AccountName>
                   <S.AccountDesc>
-                    {t(`${card.cardType} card`)} - {t(`banks.${card.bank}`)}
+                    {t(`${card.cardType} card`)} - {t(`banks.${card.bankName}`)}
                   </S.AccountDesc>
                 </S.SavingsNCardBox>
                 <S.BtnWrapper>

@@ -52,7 +52,7 @@ export default function RateChart({ graphData, onLoadComplete }) {
       {
         label: "",
         data: graphData.map((item) => item.price), // y축 : 환율
-        borderColor: "#28ffff",
+        borderColor: "#013028",
         backgroundColor: "#fff",
         tension: 0.2,
         fill: true,
