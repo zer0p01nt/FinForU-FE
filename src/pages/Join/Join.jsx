@@ -13,6 +13,7 @@ import Loading from "./Loading/Loading";
 import Complete from "./Loading/Complete";
 import { helmetTitle } from "../../constants/title";
 import { useFCMTokenRegistration } from "../../hooks/useFCMTokenRegistration";
+import { useAuthStore } from "../../stores/authStore";
 
 const TOTAL_STEPS = 3;
 
@@ -52,6 +53,8 @@ export default function Join() {
         return false;
     }
   }, [step, formData.isStep1Valid, formData.isStep2Valid, formData.isStep3Valid]);
+
+  const login = useAuthStore((state) => state.login);
 
   // 헤더 설정
   const setHeaderConfig = useHeaderStore((state) => state.setHeaderConfig);
@@ -152,6 +155,7 @@ export default function Join() {
 
       // 회원가입 성공
       if (res.status === 200) {
+        login(res.data.member);
         setIsSignupSuccess(true);
         setIsLoading(false);
         setIsCompleted(true);

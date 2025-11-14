@@ -8,6 +8,7 @@ import DeleteModal from "./DeleteModal/DeleteModal";
 import api from "../../api/api";
 import LoadingSpinner from "../../components/loading-spinner/LoadingSpinner";
 import { helmetTitle } from "../../constants/title";
+import { useAuthStore } from "../../stores/authStore";
 
 const initialWalletData = {
   walletId: null,
@@ -90,7 +91,8 @@ export default function Wallet() {
   };
 
   // 로그인 상태 확인해서 비로그인 상태면 로그인 필요 컴포넌트 띄우기
-  // return <GoToLogin />;
+  const isLoggedIn = useAuthStore((state) => state.isLoggedIn);
+  if (!isLoggedIn) return <GoToLogin />;
   return (
     <>
       <title>{`Wallet${helmetTitle}`}</title>

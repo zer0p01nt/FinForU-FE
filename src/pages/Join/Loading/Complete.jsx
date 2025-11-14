@@ -10,7 +10,7 @@ export default function Complete() {
     <S.Container>
       <CompleteCheck />
       <S.Text>{t("join.complete")}</S.Text>
-      <S.Button onClick={() => navigate("/guide")}>{t("confirm")}</S.Button>
+      <S.Button onClick={() => navigate("/guide", { replace: true })}>{t("confirm")}</S.Button>
     </S.Container>
   );
 }

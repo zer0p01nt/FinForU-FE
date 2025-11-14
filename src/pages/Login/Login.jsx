@@ -6,12 +6,15 @@ import * as S from "./LoginStyle";
 import api from "../../api/api";
 import { LANGUAGE_MAP } from "../../constants/languageMap";
 import { helmetTitle } from "../../constants/title";
+import { useAuthStore } from "../../stores/authStore";
 
 export default function Login() {
   const navigate = useNavigate();
   const { t, i18n } = useTranslation();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
+  const login = useAuthStore((state) => state.login);
 
   // 헤더 설정
   const setHeaderConfig = useHeaderStore((state) => state.setHeaderConfig);
@@ -47,12 +50,13 @@ export default function Login() {
 
       // 로그인 성공
       if (res.status === 200) {
+        login(res.data.member);
         const userLang = LANGUAGE_MAP[res.data.member.language] || res.data.member.language;
         if (userLang && userLang !== i18n.language) {
           // 유저가 설정한 언어로 언어 설정 업데이트
           i18n.changeLanguage(userLang);
         }
-        navigate("/guide");
+        navigate("/guide", { replace: true });
       }
     } catch (error) {
       if (error.response) {

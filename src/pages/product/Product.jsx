@@ -18,6 +18,7 @@ import hanaLogo from "../Rates/icon/hana.png";
 import kookminLogo from "../Rates/icon/kookmin.png";
 import wooriLogo from "../Rates/icon/woori.png";
 import { helmetTitle } from "../../constants/title";
+import { useAuthStore } from "../../stores/authStore";
 
 // 은행 이름을 로고로 매핑하는 함수
 export const getBankLogo = (bankName) => {
@@ -746,9 +747,11 @@ export default function Product() {
   const [compareBaseType, setCompareBaseType] = useState(null);
   const [savedProducts, setSavedProducts] = useState([]);
   const [floatingNotice, setFloatingNotice] = useState(null);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [aiPreferences, setAiPreferences] = useState(() => ({ ...EMPTY_PREFERENCES }));
   const [isPreferenceSheetOpen, setPreferenceSheetOpen] = useState(false);
+
+  // 로그인 전역 상태
+  const isLoggedIn = useAuthStore((state) => state.isLoggedIn);
 
   const matchesFilterChips = useCallback(
     (product) => matchesProductFilters(product, filters),
@@ -988,7 +991,9 @@ export default function Product() {
   };
 
   const handleLoginRequest = () => {
-    setIsLoggedIn(true);
+    if (!isLoggedIn) {
+      navigate("/login");
+    }
   };
 
   const handleEditPreferences = () => {
