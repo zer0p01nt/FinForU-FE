@@ -198,8 +198,18 @@ export default function WalletModal({ type, modalType, id = null, onClose }) {
 
   // API 요청 시 데이터 매핑 및 불필요 필드 제거 유틸리티 함수
   const prepareDataForApi = useCallback(
-    (data, currentType) => {
+    (data, currentType, currentModalType, itemId) => {
       const dataToSend = { ...data };
+
+      if (currentModalType.value === "edit" && itemId) {
+        if (currentType === "checking") {
+          dataToSend.checkingAccountId = itemId;
+        } else if (currentType === "savings") {
+          dataToSend.savingAccountId = itemId;
+        } else if (currentType === "card") {
+          dataToSend.cardId = itemId;
+        }
+      }
 
       // 날짜 포맷 변경
       if (currentType === "savings") {
@@ -252,7 +262,7 @@ export default function WalletModal({ type, modalType, id = null, onClose }) {
       setIsSubmitting(true);
       const { url, method } = getApiInfo(type.value, "add", null);
 
-      const dataToSend = prepareDataForApi(formData, type.value);
+      const dataToSend = prepareDataForApi(formData, type.value, modalAdd, null);
 
       try {
         const res = await api[method](url, dataToSend);
@@ -299,9 +309,10 @@ export default function WalletModal({ type, modalType, id = null, onClose }) {
     setIsSubmitting(true);
     const { url, method } = getApiInfo(type.value, modalType.value, id);
 
-    const dataToSend = prepareDataForApi(formData, type.value);
+    const dataToSend = prepareDataForApi(formData, type.value, modalType, id);
 
     try {
+      console.log(dataToSend);
       const res = await api[method](url, dataToSend);
 
       if (res.status === 200 || res.status === 201) {

@@ -9,7 +9,6 @@ import Guide from "./pages/Guide/Guide";
 import Join from "./pages/Join/Join";
 import Settings from "./pages/Settings/Settings";
 import EditInformation from "./pages/Settings/EditInformation/EditInformation";
-import DeleteAccount from "./pages/Settings/DeleteAccount/DeleteAccount";
 import Rates from "./pages/Rates/Rates";
 import Wallet from "./pages/Wallet/Wallet";
 import Map from "./pages/map/Map";
@@ -34,7 +33,6 @@ function App() {
           {/* 환경설정 관련 페이지 */}
           <Route path="/settings" element={<Settings />} />
           <Route path="/settings/edit-information" element={<EditInformation />} />
-          <Route path="/settings/delete-account" element={<DeleteAccount />} />
         </Route>
         {/* header와 navigation이 둘 다 있는 레이아웃 */}
         <Route element={<HeaderNavLayout />}>
