@@ -45,10 +45,6 @@ export default defineConfig({
           },
         ],
       },
-      devOptions: {
-        enabled: true, // 개발 모드에서 PWA 활성화
-        type: "module",
-      },
     }),
   ],
 });
